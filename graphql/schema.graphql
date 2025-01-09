@@ -1,0 +1,189 @@
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
+scalar DateTime
+    @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+"A date string with format `Y-m-d`, e.g. `2011-05-23`."
+scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
+
+"Indicates what fields are available at the top level of a query operation."
+type Query {
+    "Find a single user by an identifying attribute."
+    user(
+        "Search by primary key."
+        id: ID @eq @rules(apply: ["prohibits:email", "required_without:email"])
+
+        "Search by email address."
+        email: String
+            @eq
+            @rules(apply: ["prohibits:id", "required_without:id", "email"])
+    ): User @find
+
+    "List multiple users."
+    users(
+        "Filters by name. Accepts SQL LIKE wildcards `%` and `_`."
+        name: String @where(operator: "like")
+    ): [User!]! @paginate(defaultCount: 10)
+}
+
+"Account of a person who utilizes this application."
+type User {
+    "Unique primary key."
+    id: ID!
+
+    "Non-unique name."
+    name: String!
+
+    "Unique email address."
+    email: String!
+
+    "When the email was verified."
+    email_verified_at: DateTime
+
+    "When the account was created."
+    created_at: DateTime!
+
+    "When the account was last updated."
+    updated_at: DateTime!
+}
+
+# Query for Clients del modulo facturación
+
+type Client {
+    id: ID!
+    name: String!
+    last_name: String!
+    birth_date: Date!
+    client_type: String!
+    address: String!
+    phone: String!
+    email: String!
+    status: Boolean!
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type Invoice{
+    id: ID!,
+    client: Client @hasOne(relation: "client"),
+    payment_type: String!,
+    invoice_date: Date!,
+    total: Float!,
+    note: String,
+    details: [InvoiceDetails] @hasMany(relation: "details")
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type InvoiceDetails{
+    id: ID!,
+    invoice: Invoice @hasOne(relation: "invoice"),
+    product_id: ID!,
+    product_name: String!,
+    quantity: Int!,
+    unit_price: Float!,
+    subtotal: Float!,
+    created_at: DateTime!,
+    updated_at: DateTime!
+}
+
+type Query {
+    client(id: String @eq): Client @find
+    clients: [Client!]! @paginate(defaultCount: 10)
+    allClients: [Client!]! @all @orderBy(column: "created_at", direction: DESC)
+    filterClients(where: WhereConditions): [Client!]! @all @whereConditions
+
+    clientsCash: [Client!]! @all @where(key: "client_type", value: "Cash")
+    clientsCredit: [Client!]! @all @where(key: "client_type", value: "Credit")
+    clientsActive: [Client!]! @all @where(key: "status", value: true)
+    clientsInactive: [Client!]! @all @where(key: "status", value: false)
+
+    invoices: [Invoice!]! @all @orderBy(column: "updated_at", direction: DESC)
+    invoice(id: ID! @eq): Invoice @find
+}
+
+type Mutation {
+
+    createInvoice(input: CreateInvoiceInput! @spread): Invoice! @create
+    updateInvoice(input: UpdateInvoiceInput! @spread): Invoice! @update
+    deleteInvoice(id: ID! @whereKey): Invoice! @delete
+
+    createClient(input: InputCreateClient!): Client
+        @field(resolver: "App\\GraphQL\\Mutations\\ClientMutation@create")
+    updateClient(id: ID!, input: InputUpdateClient!): Client
+        @field(resolver: "App\\GraphQL\\Mutations\\ClientMutation@update")
+    deleteClient(id: ID!): Client
+        @field(resolver: "App\\GraphQL\\Mutations\\ClientMutation@delete")
+    restoreClient(id: ID!): Client
+        @field(resolver: "App\\GraphQL\\Mutations\\ClientMutation@restore")
+
+
+}
+
+input InputCreateClient {
+    id: ID!
+    name: String!
+    last_name: String!
+    birth_date: Date!
+    client_type: String!
+    address: String!
+    phone: String!
+    email: String!
+}
+
+input InputUpdateClient {
+    name: String
+    last_name: String!
+    birth_date: Date
+    client_type: String
+    address: String
+    phone: String
+    email: String
+}
+
+
+input CreateInvoiceDetailsInput {
+    product_id: ID!
+    product_name: String!
+    quantity: Int!
+    unit_price: Float!
+    subtotal: Float
+
+}
+
+input CreateInvoiceDetailsHasMany {
+    create: [CreateInvoiceDetailsInput!]!
+}
+
+input CreateInvoiceInput {
+    client_id: ID!
+    payment_type: String!
+    invoice_date: Date!
+    total: Float!
+    details: CreateInvoiceDetailsHasMany
+}
+
+input UpdateInvoiceInput {
+    id: ID!,
+    client_id: ID
+    payment_type: String
+    invoice_date: Date
+    total: Float
+    details: UpdateInvoiceDetailsHasMany
+}
+
+input UpdateInvoiceDetailsHasMany {
+    create: [CreateInvoiceDetailsInput!]
+    update: [UpdateInvoiceDetailsInput!]
+    delete: [ID!]
+   
+}
+
+input UpdateInvoiceDetailsInput {
+    id: ID!
+    product_id: ID
+    product_name: String
+    quantity: Int
+    unit_price: Float
+    subtotal: Float
+
+}
