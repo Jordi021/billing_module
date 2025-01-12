@@ -2,19 +2,17 @@
 
 namespace App\Livewire\Actions;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Cookie;
 
-class Logout
-{
-    /**
-     * Log the current user out of the application.
-     */
-    public function __invoke(): void
-    {
-        Auth::guard('web')->logout();
+class Logout {
+    public function __invoke(): mixed {
+        Cookie::queue(Cookie::forget('auth_and_user'));
 
-        Session::invalidate();
-        Session::regenerateToken();
+        return redirect()
+            ->route('login')
+            ->with([
+                'message' => 'Sesión cerrada correctamente.',
+                'type' => 'success',
+            ]);
     }
 }

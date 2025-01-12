@@ -3,26 +3,22 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClientController;
 
-Route::view("/", "welcome");
+Route::view('/', 'welcome');
 
-Route::view("dashboard", "dashboard")
-    ->middleware(["auth", "verified"])
-    ->name("dashboard");
+Route::middleware([ 'jwt.auth', 'jwt.rp:Vendedor' ])->group(function () {
+    Route::view('dashboard', 'dashboard')->name('dashboard');
 
-Route::view("profile", "profile")
-    ->middleware(["auth"])
-    ->name("profile");
+    //Route::view('profile', 'profile')->name('profile');
 
-Route::view("clients", "clients")
-    ->middleware(["auth"])
-    ->name("clients");
+    Route::view('clients', 'clients')->name('clients');
 
-Route::get("/invoices", function () {
-    return view("invoices.index");
-})->name("invoices.index");
+    Route::get('/invoices', function () {
+        return view('invoices.index');
+    })->name('invoices.index');
 
-Route::get("/clients/pdf", [ClientController::class, "GenerarPDF"])->name(
-    "clients.pdf"
-);
+    Route::get('/clients/pdf', [ClientController::class, 'GenerarPDF'])->name(
+        'clients.pdf'
+    );
+});
 
-require __DIR__ . "/auth.php";
+require __DIR__ . '/auth.php';
