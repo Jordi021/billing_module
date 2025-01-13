@@ -16,14 +16,12 @@ class JwtAuth {
      */
     public function handle(Request $request, Closure $next): Response {
         try {
-            // Obtener la cookie que contiene el token y los datos del usuario
             $authCookie = $request->cookie('auth_and_user');
 
             if (!$authCookie) {
                 throw new \Exception('No auth cookie found');
             }
 
-            // Decodificar la cookie
             $authData = json_decode($authCookie, false);
 
             if (!isset($authData->auth_token) || !isset($authData->user_info)) {
@@ -38,13 +36,12 @@ class JwtAuth {
                 isset($authData->user_info->exp) &&
                 $authData->user_info->exp < time()
             ) {
-                return redirect('/login')->with(
+                return redirect()->route('login')->with(
                     'error',
                     'El token JWT ha expirado. Por favor, inicia sesión nuevamente.'
                 );
             }
 
-            // Almacenar los datos del usuario en el request para uso posterior
             $request->merge([
                 'user' => [
                     'id' => $authData->user_info->id ?? null,
@@ -60,7 +57,7 @@ class JwtAuth {
             return redirect()
                 ->route('login')
                 ->with([
-                    'message' => 'Por favor, inicia sesión nuevamente.',
+                    'message' => 'Por favor, intenta iniciar sesión nuevamente.',
                     'type' => 'error',
                 ]);
         }

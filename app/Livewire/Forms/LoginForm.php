@@ -25,7 +25,7 @@ class LoginForm extends Form {
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function authenticate() {
+    public function authenticate(): void {
         $this->ensureIsNotRateLimited();
 
         try {
@@ -91,13 +91,6 @@ class LoginForm extends Form {
             );
 
             RateLimiter::clear($this->throttleKey());
-
-            return redirect()
-                ->intended('dashboard')
-                ->with([
-                    'message' => 'Inicio de sesión exitoso.',
-                    'type' => 'success',
-                ]);
         } catch (\Exception $e) {
             RateLimiter::hit($this->throttleKey());
             $this->reset('password');

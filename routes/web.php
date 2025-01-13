@@ -3,9 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClientController;
 
-Route::view('/', 'welcome');
+Route::view('/', 'welcome')->name('welcome');
 
-Route::middleware([ 'jwt.auth', 'jwt.rp:Vendedor' ])->group(function () {
+Route::middleware(['jwt.auth', 'jwt.rp:Vendedor'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
 
     //Route::view('profile', 'profile')->name('profile');
