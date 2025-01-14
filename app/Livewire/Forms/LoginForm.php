@@ -10,7 +10,8 @@ use Livewire\Attributes\Validate;
 use Livewire\Form;
 use Illuminate\Support\Facades\Cookie;
 
-class LoginForm extends Form {
+class LoginForm extends Form
+{
     #[Validate('required|string|email')]
     public string $email = '';
 
@@ -25,11 +26,12 @@ class LoginForm extends Form {
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function authenticate() {
+    public function authenticate()
+    {
         $this->ensureIsNotRateLimited();
 
         try {
-            $response = Http::post(
+            $response = Http::withoutVerifying()->post(
                 'https://seri-api-utn-2024.fly.dev/api/login',
                 [
                     'email' => $this->email,
@@ -40,7 +42,7 @@ class LoginForm extends Form {
             if (!$response->successful()) {
                 throw ValidationException::withMessages([
                     'form.email' =>
-                        'Las credenciales proporcionadas son incorrectas.',
+                    'Las credenciales proporcionadas son incorrectas.',
                 ]);
             }
 
@@ -110,7 +112,8 @@ class LoginForm extends Form {
     /**
      * Ensure the authentication request is not rate limited.
      */
-    protected function ensureIsNotRateLimited(): void {
+    protected function ensureIsNotRateLimited(): void
+    {
         if (!RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
             return;
         }
@@ -128,7 +131,8 @@ class LoginForm extends Form {
     /**
      * Get the authentication rate limiting throttle key.
      */
-    protected function throttleKey(): string {
+    protected function throttleKey(): string
+    {
         return Str::transliterate(
             Str::lower($this->email) . '|' . request()->ip()
         );
