@@ -5,8 +5,7 @@ use App\Http\Controllers\ClientController;
 
 Route::view('/', 'welcome')->name('welcome');
 
-Route::view("invoices", "livewire.invoices.index")
-    ->name("invoices");
+
 
 Route::middleware(['jwt.auth', 'jwt.rp:Vendedor'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
@@ -18,6 +17,8 @@ Route::middleware(['jwt.auth', 'jwt.rp:Vendedor'])->group(function () {
     // Route::get("/invoices", function () {
     //     return view("invoices.index");
     // })->name("invoices.index");
+
+    Route::view("invoices", "livewire.invoices.index")->name("invoices");
 
 
 
