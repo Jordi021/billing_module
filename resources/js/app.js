@@ -1,23 +1,28 @@
 import './bootstrap';
 
-const toggleTheme = () => {
-    const html = document.documentElement;
-    const isDark = html.classList.toggle('dark');
+const html = document.documentElement;
 
-    isDark
-        ? localStorage.setItem('theme', 'dark')
-        : localStorage.setItem('theme', 'light');
+const ICONS = {
+    dark: 'fa-solid fa-moon',
+    light: 'fa-solid fa-sun',
 };
 
-window.toggleTheme = toggleTheme;
+const updateThemeIcon = (isDark) => {
+    const themeIcon = document.getElementById('theme-icon');
+    if (!themeIcon) return;
+    themeIcon.className = isDark ? ICONS.dark : ICONS.light;
+};
+
+window.toggleTheme = () => {
+    const isDark = html.classList.toggle('dark');
+    localStorage.setItem('dark', isDark);
+    updateThemeIcon(isDark);
+};
 
 document.addEventListener('DOMContentLoaded', () => {
-    const html = document.documentElement;
-
-    const isDark =
-        localStorage.theme === 'dark' ||
-        (!('theme' in localStorage) &&
-            window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const isDark = localStorage.getItem('dark') === 'true';
 
     html.classList.toggle('dark', isDark);
+    updateThemeIcon(isDark);
 });
+

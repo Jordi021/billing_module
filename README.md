@@ -12,13 +12,13 @@
 ### Windows:
 
 ```sh
-git clone https://github.com/Jordi021/modulo_facturacion.git; cd modulo_facturacion; composer install; cp .env.example .env; php artisan key:generate; npm install; npm run build; php artisan migrate --seed
+git clone https://github.com/Jordi021/billing_module.git; cd billing_module; composer install; cp .env.example .env; php artisan key:generate; npm install; npm run build; php artisan migrate --seed
 ```
 
 ### Linux:
 
 ```sh
-git clone https://github.com/Jordi021/modulo_facturacion.git && cd modulo_facturacion && composer install && cp .env.example .env && php artisan key:generate && npm install && npm run build && php artisan migrate --seed
+git clone https://github.com/Jordi021/billing_module.git && cd billing_module && composer install && cp .env.example .env && php artisan key:generate && npm install && npm run build && php artisan migrate --seed
 ```
 
 <br>

@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClientController;
 
-Route::view('/', 'welcome');
+Route::view('/', 'welcome')->name('welcome');
 
 Route::view("invoices", "livewire.invoices.index")
     ->name("invoices");
