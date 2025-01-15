@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout :title="__('Manage Clients')">
     <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-end mb-0 mt-6">
             <!-- Header Tab -->
@@ -8,7 +8,6 @@
                 </h2>
             </div>
         </div>
-
             <!-- Filters Section -->
             <livewire:clients.actions-filters />
 

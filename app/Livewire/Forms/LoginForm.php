@@ -35,6 +35,7 @@ class LoginForm extends Form
                 [
                     'email' => $this->email,
                     'password' => $this->password,
+                    'module_key' => "BILM"
                 ]
             );
 
