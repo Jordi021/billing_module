@@ -1,4 +1,7 @@
 import './bootstrap';
+// import 'tom-select/dist/css/tom-select.css';
+import 'tom-select/dist/css/tom-select.bootstrap5.css';
+import TomSelect from 'tom-select';
 
 const html = document.documentElement;
 
@@ -26,3 +29,4 @@ document.addEventListener('DOMContentLoaded', () => {
     updateThemeIcon(isDark);
 });
 
+window.TomSelect = TomSelect;

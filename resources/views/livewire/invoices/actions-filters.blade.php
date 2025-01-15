@@ -5,7 +5,7 @@
                 <x-primary-button
                     class="w-36 justify-center gap-2 bg-green-400 hover:bg-green-500 dark:bg-green-300 focus:bg-green-600 active:bg-green-600 dark:active:bg-green-200 dark:focus:bg-green-200 dark:hover:bg-green-400 focus:ring-green-600"
                     x-on:click.prevent="$dispatch('open-modal', 'invoice-modal')">
-                    {{ __('Add') }} <i class="fa-solid fa-user-plus"></i>
+                    {{ __('Add') }} <i class="fa-solid fa-plus"></i>
                 </x-primary-button>
             </div>
             {{-- <div>

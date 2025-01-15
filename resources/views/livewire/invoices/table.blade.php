@@ -30,8 +30,15 @@
                                         }
                                     @endphp
 
-                                    <x-custom-button color="{{ $color }}" img="{{ $imgSrc }}"
-                                        wire:click="$dispatch('client-modal', { clientId: '{{ $invoice->client_id }}' })" />
+                                    <div class="flex items-center gap-2">
+
+                                        <x-custom-button color="{{ $color }}" img="{{ $imgSrc }}"
+                                            wire:click="$dispatch('client-modal', { clientId: '{{ $invoice->client_id }}' })" />
+                                        <div>
+                                            {{ $invoice->client->name[0] }}. {{ $invoice->client->last_name }}
+                                        </div>
+                                    </div>
+
                                 </td>
 
                                 <td class="px-4 py-2 whitespace-nowrap">{{ $invoice['payment_type'] }}</td>
