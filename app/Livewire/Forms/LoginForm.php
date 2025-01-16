@@ -10,8 +10,7 @@ use Livewire\Attributes\Validate;
 use Livewire\Form;
 use Illuminate\Support\Facades\Cookie;
 
-class LoginForm extends Form
-{
+class LoginForm extends Form {
     #[Validate('required|string|email')]
     public string $email = '';
 
@@ -28,26 +27,23 @@ class LoginForm extends Form
      */
     public function authenticate() {
         $this->ensureIsNotRateLimited();
-
         try {
             $response = Http::withoutVerifying()->post(
                 'https://seri-api-utn-2024.fly.dev/api/login',
                 [
                     'email' => $this->email,
                     'password' => $this->password,
-                    'module_key' => "BILM"
+                    'module_key' => 'BILM',
                 ]
             );
 
             if (!$response->successful()) {
                 throw ValidationException::withMessages([
-                    'form.email' =>
-                    'Las credenciales proporcionadas son incorrectas.',
+                    'form.email' => $response->json()['error'],
                 ]);
             }
 
-            $data = $response->json();
-            $token = $data['token'];
+            $token = $response->json()['token'];
 
             if (!str_contains($token, '.')) {
                 throw ValidationException::withMessages([
@@ -96,8 +92,14 @@ class LoginForm extends Form
         } catch (\Exception $e) {
             RateLimiter::hit($this->throttleKey());
             $this->reset('password');
+
+            if ($e instanceof ValidationException) {
+                throw $e;
+            }
+
             throw ValidationException::withMessages([
-                'form.email' => 'Credenciales no validas.',
+                'form.email' =>
+                    'Ocurrió un error inesperado. Por favor, inténtalo de nuevo más tarde.',
             ]);
         }
     }
@@ -105,8 +107,7 @@ class LoginForm extends Form
     /**
      * Ensure the authentication request is not rate limited.
      */
-    protected function ensureIsNotRateLimited(): void
-    {
+    protected function ensureIsNotRateLimited(): void {
         if (!RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
             return;
         }
@@ -124,8 +125,7 @@ class LoginForm extends Form
     /**
      * Get the authentication rate limiting throttle key.
      */
-    protected function throttleKey(): string
-    {
+    protected function throttleKey(): string {
         return Str::transliterate(
             Str::lower($this->email) . '|' . request()->ip()
         );
