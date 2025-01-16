@@ -87,56 +87,6 @@ class Modal extends Component {
         }
     }
 
-    public function addDetail()
-    {
-        if (!$this->selectedProduct || $this->quantity < 1) {
-            return;
-        }
-
-        $product = collect($this->products)->firstWhere('id', $this->selectedProduct);
-
-        if ($product) {
-            $this->invoiceDetails[] = [
-                'product_id' => $product['id'],
-                'title' => $product['title'],
-                'price' => $product['price'],
-                'quantity' => $this->quantity
-            ];
-
-            $this->calculateTotal();
-            $this->resetInputs();
-        }
-    }
-
-    public function removeDetail($index)
-    {
-        unset($this->invoiceDetails[$index]);
-        $this->invoiceDetails = array_values($this->invoiceDetails);
-        $this->calculateTotal();
-    }
-
-    public function editRow($index)
-    {
-        $this->editingIndex = $index;
-        $this->editingQuantity = $this->invoiceDetails[$index]['quantity'];
-    }
-
-    public function updateQuantity($index)
-    {
-        if ($this->editingQuantity > 0) {
-            $this->invoiceDetails[$index]['quantity'] = $this->editingQuantity;
-            $this->calculateTotal();
-        }
-        $this->editingIndex = null;
-        $this->editingQuantity = null;
-    }
-
-    private function calculateTotal()
-    {
-        $this->total = collect($this->invoiceDetails)->sum(function ($detail) {
-            return $detail['price'] * $detail['quantity'];
-        });
-    }
 
     private function resetInputs()
     {
