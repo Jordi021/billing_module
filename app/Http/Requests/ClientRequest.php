@@ -20,8 +20,8 @@ class ClientRequest extends FormRequest {
      */
     public function rules($id = ''): array {
         $rules = [
-            'name' => ['required', 'string', 'max:50'],
-            'last_name' => ['required', 'string', 'max:50'],
+            'name' => ['required', 'string', 'max:50', 'alpha'],
+            'last_name' => ['required', 'string', 'max:50', 'alpha'],
             'birth_date' => [
                 'required',
                 'date',
@@ -29,8 +29,8 @@ class ClientRequest extends FormRequest {
                 'before_or_equal:' . now()->toDateString(),
             ],
             'client_type' => ['required', 'string', 'in:Cash,Credit'],
-            'address' => ['required', 'string'],
-            'phone' => ['required', 'string'],
+            'address' => ['required', 'string', 'min:10'],
+            'phone' => ['required', 'string', 'numeric', 'digits:9'],
             'email' => ['required', 'email'],
         ];
 
