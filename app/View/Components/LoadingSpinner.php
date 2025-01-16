@@ -16,7 +16,7 @@ class LoadingSpinner extends Component {
      * @param string $color
      * @param string $size
      */
-    public function __construct($color = 'blue-600', $size = '4') {
+    public function __construct($color = 'indigo-500', $size = '4') {
         $this->color = $color;
         $this->size = $size;
     }

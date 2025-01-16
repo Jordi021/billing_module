@@ -1,7 +1,7 @@
 # MÓDULO DE FACTURACIÓN
 
 <figure align="center">
-    <img src="./public/bill.svg" width="100">
+    <img src="./public/svg//bill.svg" width="100">
 </figure>
 
 <br>

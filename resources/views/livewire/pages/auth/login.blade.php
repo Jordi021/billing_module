@@ -46,12 +46,11 @@ $login = function () {
                 href="{{ url('/') }}">
                 {{ __('Go back') }}
             </a>
-
             <x-primary-button class="ms-3 flex items-center gap-2" wire:loading.attr="disabled"
                 wire:loading.class="opacity-50 cursor-not-allowed">
                 {{ __('Log in') }}
                 <div wire:loading wire:target="login">
-                    <x-loading-spinner />
+                    <x-loading-spinner color="black" />
                 </div>
             </x-primary-button>
 
