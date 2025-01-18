@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('client_id', 10);
             $table->enum('payment_type', ['cash', 'credit']);
             $table->date('invoice_date');
-            $table->decimal('total', 10, 2);
+            $table->decimal('total', 10, 2)->nullable();
             $table->text('note')->nullable();
             $table->timestamps();
 

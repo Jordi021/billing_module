@@ -5,7 +5,7 @@
                 <table class="min-w-full divide-y divide-gray-200 table-auto text-base">
                     <thead class="bg-gray-50 dark:bg-gray-700">
                         <tr>
-                            @foreach (['ID', 'Client', 'Payment Type', 'Date', 'Total', 'Note', 'Details', 'Actions'] as $header)
+                            @foreach (['ID', 'Client', 'Payment Type', 'Date', 'Note', 'Details', 'Total', 'Actions'] as $header)
                                 <th scope="col"
                                     class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                     {{ __($header) }}
@@ -30,22 +30,29 @@
                                         }
                                     @endphp
 
-                                    <x-custom-button color="{{ $color }}" img="{{ $imgSrc }}"
-                                        wire:click="$dispatch('client-modal', { clientId: '{{ $invoice->client_id }}' })" />
+                                    <div class="flex items-center gap-2">
+
+                                        <x-custom-button color="{{ $color }}" img="{{ $imgSrc }}"
+                                            wire:click="$dispatch('client-modal', { clientId: '{{ $invoice->client_id }}' })" />
+                                        <div>
+                                            {{ $invoice->client->name[0] }}. {{ $invoice->client->last_name }}
+                                        </div>
+                                    </div>
+
                                 </td>
 
                                 <td class="px-4 py-2 whitespace-nowrap">{{ $invoice['payment_type'] }}</td>
                                 <td class="px-4 py-2 whitespace-nowrap">{{ $invoice['invoice_date'] }}</td>
-                                <td class="px-4 py-2 whitespace-nowrap">{{ $invoice['total'] ?? '$0' }}</td>
                                 <td class="px-4 py-2 whitespace-nowrap">{{ $invoice['note'] }}</td>
                                 <td class="px-4 py-2 whitespace-nowrap">
                                     <x-custom-button color="bg-blue-400" icon="fas fa-book"
                                         wire:click="$dispatch('details-modal', { invoiceId: '{{ $invoice->id }}' })" />
                                 </td>
+                                <td class="px-4 py-2 whitespace-nowrap">{{ $invoice['total'] ? '$'.$invoice['total'] : '$0'}}</td>
                                 <td class="px-4 py-2 whitespace-nowrap">
                                     <div class="flex gap-1">
                                         <x-custom-button color="bg-indigo-400" icon="fa fa-pencil"
-                                            wire:click="$dispatch('invoice-edit', { invoice: {{ $invoice }} })" />
+                                            wire:click="$dispatch('invoice-edit', { invoice: {{ $invoice }}, details:{{$invoice->details}} })" />
 
                                         <x-custom-button color="bg-red-400" icon="fas fa-trash"
                                             wire:click="$dispatch('invoice-confirm', {invoice: {{ $invoice }} })" />

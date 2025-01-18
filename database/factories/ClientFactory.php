@@ -7,16 +7,18 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Client>
  */
-class ClientFactory extends Factory {
+class ClientFactory extends Factory
+{
     /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
      */
-    public function definition(): array {
+    public function definition(): array
+    {
         return [
             "id" => $this->faker->numerify("##########"), // Genera un UUID único
-            "name" => $this->faker->name(),
+            "name" => $this->faker->firstName(),
             "last_name" => $this->faker->lastName(),
             "birth_date" => $this->faker->date("Y-m-d", "2000-01-01"),
             "client_type" => $this->faker->randomElement([

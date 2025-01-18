@@ -1,3 +1,93 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Light mode (default) styles */
+.ts-wrapper {
+    --ts-bg: #fff;
+    --ts-border: #d1d5db;
+    --ts-text: #111827;
+    --ts-dropdown-bg: #fff;
+    --ts-dropdown-border: #d1d5db;
+    --ts-dropdown-hover: #f3f4f6;
+    --ts-dropdown-text: #111827;
+}
+
+/* Dark mode styles */
+.dark .ts-wrapper {
+    --ts-bg: #111827;
+    --ts-border: #374151;
+    --ts-text: #f3f4f6;
+    --ts-dropdown-bg: #1f2937;
+    --ts-dropdown-border: #374151;
+    --ts-dropdown-hover: #374151;
+    --ts-dropdown-text: #f3f4f6;
+}
+
+/* Apply custom variables */
+.ts-wrapper {
+    background: var(--ts-bg) !important;
+    border-color: var(--ts-border) !important;
+    color: var(--ts-text) !important;
+}
+
+.ts-dropdown {
+    background: var(--ts-dropdown-bg) !important;
+    border-color: var(--ts-dropdown-border) !important;
+    color: var(--ts-dropdown-text) !important;
+}
+
+.ts-dropdown .option:hover,
+.ts-dropdown .active {
+    background-color: var(--ts-dropdown-hover) !important;
+}
+
+/* Selected item text color in dark mode */
+.dark .ts-wrapper.multi .ts-control > div {
+    color: #fff !important;
+    border-color: #4b5563 !important;
+    background: #374151 !important;
+}
+
+/* Border color for the select input */
+.ts-wrapper.single .ts-control {
+    border: 1px solid #d1d5db !important;
+}
+
+.dark .ts-wrapper.single .ts-control {
+    border: 1px solid #4b5563 !important;
+}
+
+/* Text color for selected items */
+.ts-wrapper.multi .ts-control > div {
+    color: #111827 !important;
+    background: #f3f4f6 !important;
+    border: 1px solid #d1d5db !important;
+}
+
+/* Input text color */
+.ts-control > input {
+    color: #111827 !important;
+}
+
+.dark .ts-control > input {
+    color: #fff !important;
+}
+
+/* Fix for placeholder and selected text color */
+.ts-wrapper.single .ts-control .item {
+    color: #111827 !important;
+}
+
+.dark .ts-wrapper.single .ts-control .item {
+    color: #fff !important;
+}
+
+/* Dropdown arrow color */
+.ts-wrapper.single .ts-control::after {
+    border-color: #111827 transparent transparent !important;
+}
+
+.dark .ts-wrapper.single .ts-control::after {
+    border-color: #fff transparent transparent !important;
+}

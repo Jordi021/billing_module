@@ -16,10 +16,20 @@
         <!-- Table Section -->
         <livewire:invoices.table />
 
+        {{-- <form action="#">
+            <div class="mb-4">
+                <select id="select-client2" name="client_id" multiple autocomplete="off">
+    
+                </select>
+            </div>
+        </form> --}}
 
     </div>
 
     <!-- Modal Component -->
+    <x-modal name="invoice-modal" :show="false" focusable>
+        <livewire:invoices.modal />
+    </x-modal>
     <x-modal name="client-modal" :show="false" focusable>
         <livewire:invoices.client-modal />
     </x-modal>
@@ -29,4 +39,17 @@
     <x-modal name="invoice-modal-confirmation" :show="false" focusable>
         <livewire:invoices.confirmation-modal />
     </x-modal>
+
+    {{-- <script>
+    
+        const settings = {
+            plugins: ['remove_button'],
+            persist: false,
+            create: true,
+            maxItems: 1,
+        };
+        new TomSelect('#select-client2',settings);
+    
+    </script> --}}
+    
 </x-app-layout>
