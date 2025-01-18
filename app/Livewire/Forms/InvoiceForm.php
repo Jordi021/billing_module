@@ -67,19 +67,6 @@ class InvoiceForm extends Form
 
     public function store(): Invoice {
 //        dd('DATOS FORM', ['data' => $this->all()]);
-//        $this->validate($this->rules(false));
-//        logger('DATOS FORM', ['data' => $this->all()]);
-//
-//
-//        try {
-//            $invoice = Invoice::create($this->all());
-//            $invoice->total = 0;
-//        } catch (\Throwable $th) {
-//            throw $th;
-//        }
-//
-//        $this->reset();
-//        dd('DATOS FORM', ['data' => $this->all()]);
         $validated = $this->validate();
 
         try {
@@ -116,11 +103,49 @@ class InvoiceForm extends Form
         }
     }
 
-    public function update(): void {
-        $this->validate($this->rules());
+    public function update(): Invoice {
+//        logger()->info('Details Data:', ['details' => $this->details]);
+//        dd('DATOS FORM', ['data' => $this->all()]);
+        $validated = $this->validate();
         $invoice = Invoice::find($this->id);
-        $invoice->update($this->all());
-        $this->reset();
+        try {
+            return DB::transaction(function () use ($validated, $invoice) {
+                // Create invoice
+                $invoice->update([
+                    'client_id' => $this->client_id,
+                    'payment_type' => $this->payment_type,
+                    'invoice_date' => $this->invoice_date,
+                    'note' => $this->note,
+                    'total' => $this->total,
+                ]);
+
+
+                //empty details
+                $invoice->details()->delete();
+
+                // Create invoice details
+                foreach ($this->details as $detail) {
+                    $invoice->details()->create([
+                        'invoice_id' => $invoice->id,
+                        'product_id' => $detail['product_id'],
+                        'product_name' => $detail['product_name'],
+                        'quantity' => $detail['quantity'],
+                        'unit_price' => $detail['unit_price'],
+                        'subtotal' => $detail['subtotal'],
+                    ]);
+                }
+
+                $this->reset();
+
+                return $invoice;
+            });
+        } catch (\Exception $e) {
+            logger()->error('Error updating invoice:', [
+                'error' => $e->getMessage(),
+                'data' => $this->all()
+            ]);
+            throw $e;
+        }
     }
 
 

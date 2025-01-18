@@ -20,14 +20,25 @@ class Modal extends Component {
     public $editingIndex = null;
     public $editingQuantity = null;
     public array $details = [];
+    public ?float  $total = 0;
 
     #[On("invoice-edit")]
     public function edit($invoice, $details) {
         $this->isEditing = true;
-
         $this->form->fill($invoice);
-        $this->details = $details;
+        // Reset details to ensure it matches the database records
+        $this->form->details = collect($details)->map(function ($detail) {
+            return [
+                'product_id' => $detail['product_id'],
+                'product_name' => $detail['product_name'],
+                'unit_price' => $detail['unit_price'],
+                'quantity' => $detail['quantity'],
+                'subtotal' => $detail['subtotal'],
+            ];
+        })->toArray();
+
         $this->selectedClient = $invoice['client_id'];
+
         $this->dispatch("open-modal", "invoice-modal");
     }
 
@@ -55,6 +66,10 @@ class Modal extends Component {
 
     public function mount()
     {
+        $this->form = new InvoiceForm($this, 'form'); // Initialize the InvoiceForm
+        $this->form->details = []; // Initialize details as an empty array
+        $this->total = 0; // Initialize total
+
         // Load all clients for the dropdown
         $this->clients = Client::orderBy('last_name', 'asc')->get()
             ->map(function($client) {
@@ -88,6 +103,59 @@ class Modal extends Component {
             $this->products = [];
         }
     }
+
+    public function addDetail($productId, $quantity)
+    {
+        logger()->info('addDetail called', ['productId' => $productId, 'quantity' => $quantity]);
+
+        if (empty($productId)) {
+            logger()->error('Product ID is empty.', ['productId' => $productId]);
+            return;
+        }
+
+        $product = collect($this->products)->firstWhere('id', $productId);
+        if ($product) {
+            $subtotal = $product['price'] * $quantity;
+
+            // Check if the product already exists in the details
+            $existingIndex = collect($this->form->details)->search(function ($detail) use ($productId) {
+                return $detail['product_id'] == $productId;
+            });
+
+            if ($existingIndex !== false) {
+                // Update the existing product's quantity and subtotal
+                $this->form->details[$existingIndex]['quantity'] += $quantity;
+                $this->form->details[$existingIndex]['subtotal'] += $subtotal;
+            } else {
+                // Add the new product to the details array
+                $this->form->details[] = [
+                    'product_id' => $product['id'],
+                    'product_name' => $product['title'],
+                    'unit_price' => $product['price'],
+                    'quantity' => $quantity,
+                    'subtotal' => $subtotal,
+                ];
+            }
+
+            // Update the total
+            $this->form->total = collect($this->form->details)->sum('subtotal');
+
+            logger()->info('Product added or updated in details', $this->form->details);
+        } else {
+            logger()->error('Product not found for ID', ['productId' => $productId]);
+        }
+    }
+
+
+
+    public function removeDetail($index)
+    {
+        unset($this->form->details[$index]);
+        $this->form->details = array_values($this->form->details); // Reindex the array
+
+        $this->form->total = array_sum(array_column($this->form->details, 'subtotal'));
+    }
+
 
 
     private function resetInputs()

@@ -8,7 +8,7 @@
             <label for="client_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {{__('Client')}}
             </label>
-            <select id="select-client" name="client_id" multiple autocomplete="off" wire:form.client_id>
+            <select id="select-client" name="client_id"  autocomplete="off" wire:form.client_id>
             </select>
         </div>
 
@@ -32,7 +32,7 @@
             <x-input-error :messages="$errors->get('form.payment_type')" class="mt-2"/>
         </div>
 
-        <div class="mb-4" wire:ignore>
+        <div class="mb-4">
             <p class="block  font-bold text-gray-700 dark:text-gray-300">
                 {{__('Details')}}
             </p>
@@ -45,7 +45,7 @@
 
             <div class="space-y-4">
                 <div class="flex items-center w-full gap-4">
-                    <div class="flex-grow">
+                    <div class="flex-grow"  wire:ignore>
                         <select id="select-product" name="product" multiple autocomplete="off"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white">
                         </select>
@@ -96,41 +96,50 @@
                         </th>
                     </tr>
                     </thead>
-                    <tbody id="details-table"
-                           class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-800">
-                    @foreach($details as $detail)
+                    <tbody id="details-table" class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-800">
+                    @if(!empty($form->details) && is_array($form->details))
+                        @foreach($form->details as $index => $detail)
+                            <tr wire:key="detail-{{ $detail['product_id'] }}">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{{ $detail['product_id'] }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{{ $detail['product_name'] }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-200">${{ number_format($detail['unit_price'], 2) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-200">{{ $detail['quantity'] }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-200">${{ number_format($detail['subtotal'], 2) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <button type="button" wire:click="removeDetail({{ $index }})" class="text-red-600 hover:text-red-900 dark:hover:text-red-400">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
+                    @else
                         <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{{ $detail['product_id'] }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{{ $detail['product_name'] }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-200">
-                                ${{ number_format($detail['unit_price'], 2) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-200">{{ $detail['quantity'] }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-200">
-                                ${{ number_format($detail['subtotal'], 2) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button type="button"
-                                        class="text-red-600 hover:text-red-900 dark:hover:text-red-400">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                            <td colspan="6" class="text-center text-gray-500 dark:text-gray-400">
+                                {{ __('No details available.') }}
                             </td>
                         </tr>
-                    @endforeach
+                    @endif
                     </tbody>
 
+
+
                     <tfoot class="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                        <td colspan="4"
-                            class="px-6 py-4 text-right text-sm font-medium text-gray-900 dark:text-gray-200">Total:
-                        </td>
-                        <td id="total-invoice"
-                            class="px-6 py-4 text-right text-sm font-medium text-gray-900 dark:text-gray-200">
-                        </td>
-                        <td></td>
-                    </tr>
+                        <tr>
+                            <td colspan="4"
+                                class="px-6 py-4 text-right text-sm font-medium text-gray-900 dark:text-gray-200">Total:
+                            </td>
+                            <td id="total-invoice"
+                                class="px-6 py-4 text-right text-sm font-medium text-gray-900 dark:text-gray-200">
+                                @if(!empty($form->total))
+                                    ${{ number_format($form->total, 2) }}
+
+                                @endif
+                            </td>
+                            <td></td>
+                        </tr>
                     </tfoot>
                 </table>
             </div>
-
         </div>
 
         <div class="mb-4">
@@ -154,181 +163,134 @@
 </div>
 
 <script>
-    document.addEventListener('livewire:navigated', function () {
+    document.addEventListener('DOMContentLoaded', function () {
+        initializeTomSelect();
+        console.log("DOM fully loaded and parsed");
+
+        // Attach the event listener to the Add button after DOM is ready
+        setupAddButton();
+    });
+
+    document.addEventListener('livewire:load', function () {
+        initializeTomSelect();
+        console.log("Livewire load event triggered");
+
+        // Re-attach the event listener to the Add button after Livewire components load
+        setupAddButton();
+    });
+
+    document.addEventListener('livewire:update', function () {
+        initializeTomSelect();
+        console.log("Livewire update event triggered");
+
+        // Re-attach the event listener to the Add button after Livewire updates
+        setupAddButton();
+    });
+
+    function initializeTomSelect() {
         const selectClient = document.querySelector('#select-client');
         const selectProduct = document.querySelector('#select-product');
-        const tableBody = document.querySelector('#details-table tbody');
-        const detailsInput = document.querySelector('#details-input');
-        const totalInput = document.querySelector('#total-input');
-        let productInstance = null;
-        let total = 0;
-        let details = [];
 
-        if (selectClient) {
-            const clients = @json($clients);
-
+        // Initialize TomSelect for Clients
+        if (selectClient && !selectClient.tomselect) {
+            console.log("Initializing TomSelect for Clients");
             new TomSelect(selectClient, {
                 valueField: 'value',
                 labelField: 'text',
                 searchField: 'text',
-                options: clients,
+                options: @json($clients),
                 persist: false,
                 create: false,
                 maxItems: 1,
-                onInitialize: function () {
-                    @if($selectedClient)
-                        this.setValue('{{ $selectedClient }}');
-                    @endif
-                },
                 onChange: function (value) {
-                    @this.
-                    set('selectedClient', value.toString());
-                    @this.
-                    set('form.client_id', value.toString());
+                    console.log("Client changed:", value);
+                    @this.set('selectedClient', value);
+                    @this.set('form.client_id', value);
                 },
             });
         }
 
-        if (selectProduct) {
-            const products = @json($products);
-
-            productInstance = new TomSelect(selectProduct, {
+        // Initialize TomSelect for Products
+        if (selectProduct && !selectProduct.tomselect) {
+            console.log("Initializing TomSelect for Products");
+            new TomSelect(selectProduct, {
                 valueField: 'id',
                 labelField: 'title',
                 searchField: 'title',
-                options: products,
+                options: @json($products),
                 persist: false,
                 create: false,
                 maxItems: 1,
                 render: {
                     option: function (data, escape) {
                         return `<div class="flex justify-between items-center py-2">
-                        <span class="text-sm">${escape(data.title)}</span>
-                        <span class="text-sm font-semibold">$${escape(data.price)}</span>
-                    </div>`;
+                                <span class="text-sm">${escape(data.title)}</span>
+                                <span class="text-sm font-semibold">$${escape(data.price)}</span>
+                            </div>`;
                     },
                     item: function (data, escape) {
                         return `<div>
-                        <span class="text-sm">${escape(data.title)} - </span>
-                        <span class="text-sm font-semibold">$${escape(data.price)}</span>
-                    </div>`;
-                    }
-                },
-                onInitialize: function () {
-                    @if($selectedProduct)
-                        this.setValue('{{ $selectedProduct }}');
-                    @endif
+                                <span class="text-sm">${escape(data.title)} - </span>
+                                <span class="text-sm font-semibold">$${escape(data.price)}</span>
+                            </div>`;
+                    },
                 },
                 onChange: function (value) {
-                    @this.
-                    set('selectedProduct', value.toString());
+                    console.log("Product changed:", value);
+                    @this.set('selectedProduct', value);
                 },
             });
+        }
+    }
 
+    // Function to set up the Add button event listener
+    function setupAddButton() {
+        const addButton = document.getElementById('add-btn');
+        if (addButton) {
+            addButton.removeEventListener('click', handleAddButtonClick); // Avoid duplicate listeners
+            addButton.addEventListener('click', handleAddButtonClick);
+        }
+    }
 
+    // Function to handle Add button click
+    function handleAddButtonClick() {
+        const selectProduct = document.querySelector('#select-product');
+        const qtyInput = document.getElementById('qty-input');
+
+        if (!selectProduct || !qtyInput || !selectProduct.tomselect) {
+            alert('Please ensure the product selector and quantity input are correctly initialized.');
+            return;
         }
 
-        document.getElementById('add-btn').addEventListener('click', function () {
-            if (!productInstance) {
-                console.log('Product selector is not initialized.');
-                return;
-            }
+        const productInstance = selectProduct.tomselect;
+        const selectedProductIdArray = productInstance.getValue(); // Get the array of selected product IDs
+        const selectedProductId = Array.isArray(selectedProductIdArray) && selectedProductIdArray.length > 0
+            ? selectedProductIdArray[0]
+            : null; // Extract the first ID if available
 
-            const selectedProductId = productInstance.getValue();
-            const selectedProductData = productInstance.options[selectedProductId];
-
-            let qtyInput = document.getElementById('qty-input');
-
-            if (!qtyInput || !qtyInput.value || qtyInput.value <= 0) {
-                alert('Please enter a valid quantity.');
-                return;
-            }
-
-            const quantity = parseInt(qtyInput.value);
-            const subtotal = (selectedProductData.price * quantity).toFixed(2);
-            total += parseFloat(subtotal);
-
-            const detailIndex = details.length;
-            // Add to details array
-            details.push({
-                index: detailIndex,
-                product_id: selectedProductData.id,
-                product_name: selectedProductData.title,
-                unit_price: selectedProductData.price,
-                quantity: quantity,
-                subtotal: parseFloat(subtotal)
-            });
-
-            @this.
-            set('form.details', details);
-            @this.
-            set('form.total', total);
-
-            console.log('Details input');
-            console.log(details);
-
-            // Update hidden inputs
-            detailsInput.value = JSON.stringify(details);
-            totalInput.value = total.toFixed(2);
-
-            // Create a new row
-            let row = document.createElement('tr');
-            row.setAttribute('data-index', detailIndex);
-
-            // Add cells to the row
-            row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">${selectedProductData.id}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">${selectedProductData.title}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-200">$${selectedProductData.price.toFixed(2)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-200">${qtyInput.value}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-200">$${subtotal}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button type='button' class="delete-row text-red-600 hover:text-red-900 dark:hover:text-red-400">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
+        const selectedProductData = selectedProductId ? productInstance.options[selectedProductId] : null;
 
 
-            // Append the row to the tbody
-            tableBody.appendChild(row);
+        // Debugging logs
+        console.log('Selected Product ID:', selectedProductId);
+        console.log('Selected Product Data:', selectedProductData);
+        console.log('Quantity:', qtyInput.value);
 
-            // Update total
-            const totalInvoice = document.getElementById('total-invoice');
-            totalInvoice.textContent = `$${total.toFixed(2)}`
+        if (!selectedProductData || !qtyInput.value || qtyInput.value <= 0) {
+            alert('Please select a valid product and enter a valid quantity.');
+            return;
+        }
 
-            // Add event listener to the delete button
-            row.querySelector('.delete-row').addEventListener('click', function () {
+        const quantity = parseInt(qtyInput.value);
 
-                const rowIndex = parseInt(row.getAttribute('data-index'));
-                // Remove the corresponding entry from the details array
-                details = details.filter(detail => detail.index !== rowIndex);
+        // Call Livewire method
+        @this.call('addDetail', selectedProductId, quantity);
 
-                console.log('Details updated');
-                console.log(details);
-
-                @this.
-                set('form.details', details);
-                @this.
-                set('form.total', total);
-
-                // Recalculate total when deleting a row
-                const rowSubtotal = parseFloat(subtotal);
-                total -= rowSubtotal;
-                totalInvoice.textContent = `$${total.toFixed(2)}`;
-                row.remove(); // Remove the row from the DOM
-            });
-
-            // Clear inputs
-            qtyInput.value = '';
-            productInstance.clear();
-        });
-
-        Livewire.on('resetProduct', () => {
-            if (selectProduct && selectProduct.tomselect) {
-                selectProduct.tomselect.clear();
-            }
-        });
-    });
+        // Clear inputs
+        qtyInput.value = '';
+        productInstance.clear();
+    }
 
 </script>
+
+
