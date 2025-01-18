@@ -14,18 +14,20 @@ class Modal extends Component {
     public $selectedClient = null;
     public $selectedProduct = null;
     public $clients = [];
-    public $details = [];
+
     public $products = [];
     public $quantity = 1;
-    public $invoiceDetails = [];
     public $editingIndex = null;
     public $editingQuantity = null;
-    public $total = 0;
+    public array $details = [];
 
     #[On("invoice-edit")]
-    public function edit($invoice) {
+    public function edit($invoice, $details) {
         $this->isEditing = true;
+
         $this->form->fill($invoice);
+        $this->details = $details;
+        $this->selectedClient = $invoice['client_id'];
         $this->dispatch("open-modal", "invoice-modal");
     }
 

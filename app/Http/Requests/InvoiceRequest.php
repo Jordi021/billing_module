@@ -22,16 +22,17 @@ class InvoiceRequest extends FormRequest
     public function rules($id = ''): array
     {
         $rules = [
-            'client_id' => ['required', 'exists:clients,id'],
-            'invoice_date' => ['required', 'date', 'after_or_equal:1900-01-01', 'before_or_equal:' . now()->toDateString()],
-            'note' => ['nullable', 'string'],
-            'total' => ['required', 'numeric', 'min:0'],
-            'details' => ['required', 'array', 'min:1'],
-            'details.*.product_id' => ['required', 'integer'],
-            'details.*.product_name' => ['required', 'string'],
-            'details.*.quantity' => ['required', 'integer', 'min:1'],
-            'details.*.unit_price' => ['required', 'numeric', 'min:0'],
-            'details.*.subtotal' => ['required', 'numeric', 'min:0'],
+            'client_id' => 'required|exists:clients,id',
+            'payment_type' => 'required|in:cash,credit',
+            'invoice_date' => 'required|date',
+            'note' => 'nullable|string|max:255',
+            'total' => 'required|numeric|min:0',
+            'details' => 'required|array|min:1',
+            'details.*.product_id' => 'required|integer',
+            'details.*.product_name' => 'required|string',
+            'details.*.quantity' => 'required|integer|min:1',
+            'details.*.unit_price' => 'required|numeric|min:0',
+            'details.*.subtotal' => 'required|numeric|min:0',
         ];
 
         // if ($this->isMethod('POST')) {

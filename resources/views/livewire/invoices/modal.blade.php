@@ -8,7 +8,7 @@
             <label for="client_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {{__('Client')}}
             </label>
-            <select id="select-client" name="client_id" multiple autocomplete="off">
+            <select id="select-client" name="client_id" multiple autocomplete="off" wire:form.client_id>
             </select>
         </div>
 
@@ -36,6 +36,8 @@
             <p class="block  font-bold text-gray-700 dark:text-gray-300">
                 {{__('Details')}}
             </p>
+            <x-input-error :messages="$errors->get('form.details')" class="mt-2"/>
+            <x-input-error :messages="$errors->get('form.total')" class="mt-2"/>
 
             <label for="product" class="mt-4 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {{__('Product')}}
@@ -66,6 +68,10 @@
                 </div>
             </div>
 
+
+            <input type="hidden" id="details-input" name="details" wire:model="form.details">
+            <input type="hidden" id="total-input" name="total" wire:model="form.total">
+
             <!-- Details Table -->
             <div class="overflow-y-auto max-h-72 mt-4">
                 <table id="details-table" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -87,33 +93,37 @@
                             Subtotal
                         </th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-
                         </th>
                     </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-800">
-                    @foreach($invoiceDetails as $index => $detail)
+                    <tbody id="details-table"
+                           class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-800">
+                    @foreach($details as $detail)
                         <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{{ $detail['product_id'] }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{{ $detail['product_name'] }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-200">
-                            </td>
+                                ${{ number_format($detail['unit_price'], 2) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-200">{{ $detail['quantity'] }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-200">
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-200">
-                            </td>
+                                ${{ number_format($detail['subtotal'], 2) }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button type="button"
+                                        class="text-red-600 hover:text-red-900 dark:hover:text-red-400">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </td>
                         </tr>
                     @endforeach
                     </tbody>
+
                     <tfoot class="bg-gray-50 dark:bg-gray-700">
                     <tr>
                         <td colspan="4"
                             class="px-6 py-4 text-right text-sm font-medium text-gray-900 dark:text-gray-200">Total:
                         </td>
-                        <td id="total-invoice"  class="px-6 py-4 text-right text-sm font-medium text-gray-900 dark:text-gray-200">
-                            ${{ number_format($total, 2) }}
+                        <td id="total-invoice"
+                            class="px-6 py-4 text-right text-sm font-medium text-gray-900 dark:text-gray-200">
                         </td>
                         <td></td>
                     </tr>
@@ -148,8 +158,11 @@
         const selectClient = document.querySelector('#select-client');
         const selectProduct = document.querySelector('#select-product');
         const tableBody = document.querySelector('#details-table tbody');
+        const detailsInput = document.querySelector('#details-input');
+        const totalInput = document.querySelector('#total-input');
         let productInstance = null;
         let total = 0;
+        let details = [];
 
         if (selectClient) {
             const clients = @json($clients);
@@ -231,11 +244,36 @@
                 return;
             }
 
-            const subtotal = (selectedProductData.price * qtyInput.value).toFixed(2);
+            const quantity = parseInt(qtyInput.value);
+            const subtotal = (selectedProductData.price * quantity).toFixed(2);
             total += parseFloat(subtotal);
+
+            const detailIndex = details.length;
+            // Add to details array
+            details.push({
+                index: detailIndex,
+                product_id: selectedProductData.id,
+                product_name: selectedProductData.title,
+                unit_price: selectedProductData.price,
+                quantity: quantity,
+                subtotal: parseFloat(subtotal)
+            });
+
+            @this.
+            set('form.details', details);
+            @this.
+            set('form.total', total);
+
+            console.log('Details input');
+            console.log(details);
+
+            // Update hidden inputs
+            detailsInput.value = JSON.stringify(details);
+            totalInput.value = total.toFixed(2);
 
             // Create a new row
             let row = document.createElement('tr');
+            row.setAttribute('data-index', detailIndex);
 
             // Add cells to the row
             row.innerHTML = `
@@ -251,19 +289,33 @@
                     </td>
                 `;
 
+
             // Append the row to the tbody
             tableBody.appendChild(row);
 
             // Update total
-            const totalInput = document.getElementById('total-invoice');
-            totalInput.textContent = `$${total.toFixed(2)}`
+            const totalInvoice = document.getElementById('total-invoice');
+            totalInvoice.textContent = `$${total.toFixed(2)}`
 
             // Add event listener to the delete button
             row.querySelector('.delete-row').addEventListener('click', function () {
+
+                const rowIndex = parseInt(row.getAttribute('data-index'));
+                // Remove the corresponding entry from the details array
+                details = details.filter(detail => detail.index !== rowIndex);
+
+                console.log('Details updated');
+                console.log(details);
+
+                @this.
+                set('form.details', details);
+                @this.
+                set('form.total', total);
+
                 // Recalculate total when deleting a row
                 const rowSubtotal = parseFloat(subtotal);
                 total -= rowSubtotal;
-                totalInput.textContent = `$${total.toFixed(2)}`;
+                totalInvoice.textContent = `$${total.toFixed(2)}`;
                 row.remove(); // Remove the row from the DOM
             });
 
@@ -271,73 +323,6 @@
             qtyInput.value = '';
             productInstance.clear();
         });
-
-        document.getElementById('form-invoice').addEventListener('submit', async function (event) {
-            event.preventDefault(); // Prevent default form submission behavior
-
-            const clientId = document.querySelector('#select-client').value;
-            const invoiceDate = document.querySelector('#invoice-date').value;
-            const note = document.querySelector('#note').value;
-            const total = parseFloat(document.querySelector('#total-invoice').textContent.replace('$', ''));
-
-            // Collect invoice details
-            const details = [];
-            const rows = document.querySelectorAll('#details-table tbody tr');
-            rows.forEach(row => {
-                const productId = row.cells[0].textContent.trim();
-                const productName = row.cells[1].textContent.trim();
-                const unitPrice = parseFloat(row.cells[2].textContent.replace('$', '').trim());
-                const quantity = parseInt(row.cells[3].textContent.trim());
-                const subtotal = parseFloat(row.cells[4].textContent.replace('$', '').trim());
-
-                details.push({
-                    product_id: productId,
-                    product_name: productName,
-                    unit_price: unitPrice,
-                    quantity: quantity,
-                    subtotal: subtotal,
-                });
-            });
-
-            // Prepare the payload
-            const payload = {
-                client_id: clientId,
-                invoice_date: invoiceDate,
-                note: note,
-                total: total,
-                details: details,
-            };
-
-            // Send the data to the server using fetch
-            try {
-                const response = await fetch('/invoices', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    },
-                    body: JSON.stringify(payload),
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    alert('Invoice created successfully!');
-                    // Optionally, reset the form and table
-                    document.getElementById('form-invoice').reset();
-                    document.querySelector('#details-table tbody').innerHTML = '';
-                    document.querySelector('#total-invoice').textContent = '$0.00';
-                } else {
-                    const errors = await response.json();
-                    console.error(errors);
-                    alert('Failed to create the invoice. Check the console for details.');
-                }
-            } catch (error) {
-                console.error('Error submitting the invoice:', error);
-                alert('An error occurred. Please try again.');
-            }
-        });
-
-
 
         Livewire.on('resetProduct', () => {
             if (selectProduct && selectProduct.tomselect) {
