@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\InvoiceController;
 
 Route::view('/', 'welcome')->name('welcome');
 
@@ -25,10 +26,10 @@ Route::middleware('jwt.auth')->group(function () {
 
     Route::middleware('jwt.rp:Vendedor|Reportes Facturas')->group(function () {
         Route::view('invoices', 'livewire.invoices.index')->name('invoices');
-        //     Route::get('/invoices/pdf', [
-        //     InvoiceController::class,
-        //     'GenerarPDF',
-        // ])->name('invoice.pdf');
+        Route::get('/invoices/pdf', [
+            InvoiceController::class,
+            'GenerarPDF',
+        ])->name('invoices.pdf');
     });
 });
 

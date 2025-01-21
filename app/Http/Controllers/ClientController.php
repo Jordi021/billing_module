@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Http\Requests\ClientRequest;
 use Illuminate\Http\Request;
- use Barryvdh\DomPDF\Facade\Pdf;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ClientController extends Controller {
     /**
@@ -14,7 +14,7 @@ class ClientController extends Controller {
      * @return \Illuminate\View\View
      */
     public function index() {
-        return view("clients.index");
+        return view('clients.index');
     }
 
     /**
@@ -31,9 +31,9 @@ class ClientController extends Controller {
         // Validate and retrieve validated data
         $data = $request->validated();
 
-        $data["status"] = true;
+        $data['status'] = true;
         Client::create($data);
-        return redirect()->back()->with("success", "Cliente creado.");
+        return redirect()->back()->with('success', 'Cliente creado.');
     }
 
     /**
@@ -51,7 +51,7 @@ class ClientController extends Controller {
         $data = $request->validated();
         $client->update($data);
 
-        return redirect()->back()->with("success", "Cliente actualizado.");
+        return redirect()->back()->with('success', 'Cliente actualizado.');
     }
 
     /**
@@ -66,8 +66,8 @@ class ClientController extends Controller {
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Client $client) {
-        $client->update(["status" => false]);
-        return redirect()->back()->with("success", "Client eliminado.");
+        $client->update(['status' => false]);
+        return redirect()->back()->with('success', 'Client eliminado.');
     }
 
     /**
@@ -82,9 +82,9 @@ class ClientController extends Controller {
      * @return \Illuminate\Http\RedirectResponse
      */
     public function restore(Client $client) {
-        $client->update(["status" => true]);
+        $client->update(['status' => true]);
 
-        return redirect()->back()->with("success", "Cliente restaurado.");
+        return redirect()->back()->with('success', 'Cliente restaurado.');
     }
 
     /**
@@ -99,7 +99,7 @@ class ClientController extends Controller {
 
     public function GenerarPDF() {
         $clients = Client::all();
-        $pdf = PDF::loadView("livewire.clients.pdf", compact("clients"));
-        return $pdf->download("report_clients.pdf");
+        $pdf = PDF::loadView('livewire.clients.pdf', compact('clients'));
+        return $pdf->download('report_clients.pdf');
     }
 }
