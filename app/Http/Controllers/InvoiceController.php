@@ -69,9 +69,17 @@ class InvoiceController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function GenerarPDF() {
+    public function GenerarPDF($invoiceId = null) {
+        if ($invoiceId) {
+            $invoice = Invoice::with('details')->findOrFail($invoiceId);
+            $pdf = PDF::loadView(
+                'livewire.invoices.single-pdf',
+                compact('invoice')
+            );
+            return $pdf->download('invoice-' . $invoice->id . '.pdf');
+        }
+
         $invoices = Invoice::all();
-        $invoicesdetail = InvoiceDetail::all();
         $pdf = PDF::loadView('livewire.invoices.pdf', compact('invoices'));
         return $pdf->download('report_invoices.pdf');
     }

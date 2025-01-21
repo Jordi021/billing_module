@@ -51,6 +51,11 @@
                                 <td class="px-4 py-2 whitespace-nowrap">{{ $invoice['total'] ? '$'.$invoice['total'] : '$0'}}</td>
                                 <td class="px-4 py-2 whitespace-nowrap">
                                     <div class="flex gap-1">
+                                        <a href="{{ URL('invoices/pdf/' . $invoice->id) }}" 
+                                            class="inline-flex items-center px-3 py-2 bg-blue-500 text-white rounded-md text-sm font-semibold hover:bg-blue-600 focus:ring focus:ring-blue-300 transition">
+                                            <i class="fas fa-file-pdf"></i>
+                                         </a>
+
                                         <x-custom-button color="bg-indigo-400" icon="fa fa-pencil"
                                             wire:click="$dispatch('invoice-edit', { invoice: {{ $invoice }}, details:{{$invoice->details}} })" />
 

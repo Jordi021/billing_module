@@ -30,6 +30,10 @@ Route::middleware('jwt.auth')->group(function () {
             InvoiceController::class,
             'GenerarPDF',
         ])->name('invoices.pdf');
+        Route::get('/invoices/pdf/{id}', [
+            InvoiceController::class,
+            'GenerarPDF',
+        ])->name('invoices.single-pdf');
     });
 });
 
