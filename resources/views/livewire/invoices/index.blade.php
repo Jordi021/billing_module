@@ -27,16 +27,16 @@
     </div>
 
     <!-- Modal Component -->
-    <x-modal name="invoice-modal" :show="false" focusable>
+    <x-modal name="invoice-modal" maxWidth="3xl" :show="false" focusable>
         <livewire:invoices.modal />
     </x-modal>
-    <x-modal name="client-modal" :show="false" focusable>
+    <x-modal name="client-modal" maxWidth="3xl" :show="false" focusable>
         <livewire:invoices.client-modal />
     </x-modal>
-    <x-modal name="details-modal" :show="false" focusable>
+    <x-modal name="details-modal" maxWidth="6xl" :show="false" focusable>
         <livewire:invoices.details-modal />
     </x-modal>
-    <x-modal name="invoice-modal-confirmation" :show="false" focusable>
+    <x-modal name="invoice-modal-confirmation" maxWidth="lg" :show="false" focusable>
         <livewire:invoices.confirmation-modal />
     </x-modal>
 
@@ -51,5 +51,5 @@
         new TomSelect('#select-client2',settings);
     
     </script> --}}
-    
+
 </x-app-layout>
