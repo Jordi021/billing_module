@@ -19,7 +19,6 @@ class InvoiceForm extends Form {
     public ?float $total = 0;
     public ?array $details = [];
 
-    
     public function reset2(): void {
         $this->id = null;
         $this->client_id = '';
@@ -51,7 +50,12 @@ class InvoiceForm extends Form {
         $baseRules = [
             'client_id' => 'required|exists:clients,id',
             'payment_type' => 'required|in:cash,credit',
-            'invoice_date' => 'required|date',
+            'invoice_date' => [
+                'required',
+                'date',
+                'after_or_equal:1900-01-01',
+                'before_or_equal:' . now()->toDateString(),
+            ],
             'note' => 'nullable|string|max:255',
             'total' => 'required|numeric|min:0',
             'details' => 'required|array|min:1',
