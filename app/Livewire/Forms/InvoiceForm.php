@@ -10,36 +10,44 @@ use App\Http\Requests\InvoiceRequest;
 use Livewire\Form;
 use Monolog\Logger;
 
-class InvoiceForm extends Form
-{
-
+class InvoiceForm extends Form {
     public ?int $id = null;
-    public ?int $client_id = null;
-    public ?string $payment_type = "";
-    public ?string $invoice_date = "";
-    public ?string $note = "";
-    public ?float  $total = 0;
+    public ?string $client_id = '';
+    public ?string $payment_type = '';
+    public ?string $invoice_date = '';
+    public ?string $note = '';
+    public ?float $total = 0;
     public ?array $details = [];
 
+    
+    public function reset2(): void {
+        $this->id = null;
+        $this->client_id = '';
+        $this->payment_type = '';
+        $this->invoice_date = '';
+        $this->note = '';
+        $this->total = 0;
+        $this->details = [];
+    }
 
     protected function rules(): array {
-//        $request = new InvoiceRequest();
-//        logger('request: ', ['request' => $request]);
-//        if ($isEditing) {
-//            $request->setMethod("PATCH");
-//            return $request->rules();
-//        } else {
-//            logger('ME TRANSFORMARON A POST');
-//            $request->setMethod("POST");
-////            return array_merge($request->rules(), [
-////                'details' => ['required', 'array', 'min:1'],
-////                'details.*.product_name' => ['required', 'string'],
-////                'details.*.quantity' => ['required', 'integer', 'min:1'],
-////                'details.*.unit_price' => ['required', 'numeric', 'min:0'],
-////                'details.*.subtotal' => ['required', 'numeric', 'min:0'],
-////            ]);
-//            return $request->rules();
-//        }
+        //        $request = new InvoiceRequest();
+        //        logger('request: ', ['request' => $request]);
+        //        if ($isEditing) {
+        //            $request->setMethod("PATCH");
+        //            return $request->rules();
+        //        } else {
+        //            logger('ME TRANSFORMARON A POST');
+        //            $request->setMethod("POST");
+        ////            return array_merge($request->rules(), [
+        ////                'details' => ['required', 'array', 'min:1'],
+        ////                'details.*.product_name' => ['required', 'string'],
+        ////                'details.*.quantity' => ['required', 'integer', 'min:1'],
+        ////                'details.*.unit_price' => ['required', 'numeric', 'min:0'],
+        ////                'details.*.subtotal' => ['required', 'numeric', 'min:0'],
+        ////            ]);
+        //            return $request->rules();
+        //        }
         $baseRules = [
             'client_id' => 'required|exists:clients,id',
             'payment_type' => 'required|in:cash,credit',
@@ -66,7 +74,7 @@ class InvoiceForm extends Form
     }
 
     public function store(): Invoice {
-//        dd('DATOS FORM', ['data' => $this->all()]);
+        //        dd('DATOS FORM', ['data' => $this->all()]);
         $validated = $this->validate();
 
         try {
@@ -97,15 +105,15 @@ class InvoiceForm extends Form
         } catch (\Exception $e) {
             logger()->error('Error creating invoice:', [
                 'error' => $e->getMessage(),
-                'data' => $this->all()
+                'data' => $this->all(),
             ]);
             throw $e;
         }
     }
 
     public function update(): Invoice {
-//        logger()->info('Details Data:', ['details' => $this->details]);
-//        dd('DATOS FORM', ['data' => $this->all()]);
+        //        logger()->info('Details Data:', ['details' => $this->details]);
+        //        dd('DATOS FORM', ['data' => $this->all()]);
         $validated = $this->validate();
         $invoice = Invoice::find($this->id);
         try {
@@ -118,7 +126,6 @@ class InvoiceForm extends Form
                     'note' => $this->note,
                     'total' => $this->total,
                 ]);
-
 
                 //empty details
                 $invoice->details()->delete();
@@ -142,17 +149,14 @@ class InvoiceForm extends Form
         } catch (\Exception $e) {
             logger()->error('Error updating invoice:', [
                 'error' => $e->getMessage(),
-                'data' => $this->all()
+                'data' => $this->all(),
             ]);
             throw $e;
         }
     }
 
-
-
-
     public function save(): void {
         logger('Save method triggered');
-        session()->put("temp_invoice_data", $this->all());
+        session()->put('temp_invoice_data', $this->all());
     }
 }

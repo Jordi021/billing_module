@@ -1,7 +1,7 @@
 <div >
     <form wire:submit="save" class="p-6">
         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
-            {{ $isEditing ? __('Edit Client') : __('Create New Client') }}
+            {{ $isEditing ? __('Edit Client') : __('Add New Client') }}
         </h2>
 
         <div class="mb-4">
