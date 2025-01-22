@@ -72,19 +72,19 @@
                             </th>
                             <th
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Product
+                                {{ __('Product') }}
                             </th>
                             <th
                                 class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Price
+                                {{ __('Price') }}
                             </th>
                             <th
                                 class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Quantity
+                                {{ __('Quantity') }}
                             </th>
                             <th
                                 class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Subtotal
+                                {{ __('Subtotal') }}
                             </th>
                             <th
                                 class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">

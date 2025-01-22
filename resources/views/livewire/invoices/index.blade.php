@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout :title="__('Manage invoices')">
     <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-end mb-0 mt-6">
             <!-- Header Tab -->
@@ -19,7 +19,7 @@
         {{-- <form action="#">
             <div class="mb-4">
                 <select id="select-client2" name="client_id" multiple autocomplete="off">
-    
+
                 </select>
             </div>
         </form> --}}
@@ -41,7 +41,7 @@
     </x-modal>
 
     {{-- <script>
-    
+
         const settings = {
             plugins: ['remove_button'],
             persist: false,
@@ -49,7 +49,7 @@
             maxItems: 1,
         };
         new TomSelect('#select-client2',settings);
-    
+
     </script> --}}
 
 </x-app-layout>
