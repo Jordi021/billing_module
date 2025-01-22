@@ -72,15 +72,20 @@ class InvoiceController extends Controller {
     public function GenerarPDF($invoiceId = null) {
         if ($invoiceId) {
             $invoice = Invoice::with('details')->findOrFail($invoiceId);
+
+            session()->put('locked_invoice_' . $invoiceId, true);
+
             $pdf = PDF::loadView(
                 'livewire.invoices.single-pdf',
                 compact('invoice')
             );
+
             return $pdf->download('invoice-' . $invoice->id . '.pdf');
         }
 
         $invoices = Invoice::all();
         $pdf = PDF::loadView('livewire.invoices.pdf', compact('invoices'));
+
         return $pdf->download('report_invoices.pdf');
     }
 }

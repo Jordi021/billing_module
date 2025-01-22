@@ -1,13 +1,13 @@
 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-b-lg">
-<style>
-    button:disabled {
-        background-color: #d1d5db; 
-        color: #6b7280; 
-        opacity: 0.75; 
-        cursor: not-allowed; 
-        border-color: #d1d5db;
-    }
-</style>
+    <style>
+        button:disabled {
+            background-color: #d1d5db;
+            color: #6b7280;
+            opacity: 0.75;
+            cursor: not-allowed;
+            border-color: #d1d5db;
+        }
+    </style>
     <div class="overflow-hidden">
         <div class="p-4 text-gray-900 dark:text-gray-100 overflow-x-auto flex flex-col items-center">
             @if ($invoices->isNotEmpty())
@@ -15,8 +15,7 @@
                     <thead class="bg-gray-50 dark:bg-gray-700">
                         <tr>
                             @foreach (['ID', 'Client', 'Payment Type', 'Date', 'Note', 'Details', 'Total', 'Actions'] as $header)
-                                <th scope="col"
-                                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                     {{ __($header) }}
                                 </th>
                             @endforeach
@@ -67,13 +66,21 @@
                                            <i class="fas fa-file-pdf"></i>
                                         </a>
 
-                                        <x-custom-button color="bg-indigo-400" icon="fa fa-pencil"
+                                        <x-custom-button 
+                                            :disabled="session('locked_invoice_' . $invoice->id)" 
+                                            color="{{ session('locked_invoice_' . $invoice->id) ? 'bg-gray-400' : 'bg-indigo-400' }}" 
+                                            icon="fa fa-pencil"
                                             id="edit-button-{{ $invoice->id }}" 
-                                            wire:click="$dispatch('invoice-edit', { invoice: {{ $invoice }}, details:{{$invoice->details}} })" />
-    
-                                        <x-custom-button color="bg-red-400" icon="fas fa-trash"
+                                            wire:click="$dispatch('invoice-edit', { invoice: {{ $invoice }}, details: {{$invoice->details}} })" 
+                                        />
+
+                                        <x-custom-button 
+                                            :disabled="session('locked_invoice_' . $invoice->id)" 
+                                            color="{{ session('locked_invoice_' . $invoice->id) ? 'bg-gray-400' : 'bg-red-400' }}" 
+                                            icon="fas fa-trash"
                                             id="delete-button-{{ $invoice->id }}" 
-                                            wire:click="$dispatch('invoice-confirm', {invoice: {{ $invoice }} })" />
+                                            wire:click="$dispatch('invoice-confirm', {invoice: {{ $invoice }} })" 
+                                        />
                                     </div>
                                 </td>
                             </tr>
