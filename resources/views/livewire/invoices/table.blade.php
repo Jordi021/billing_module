@@ -1,4 +1,13 @@
 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-b-lg">
+<style>
+    button:disabled {
+        background-color: #d1d5db; 
+        color: #6b7280; 
+        opacity: 0.75; 
+        cursor: not-allowed; 
+        border-color: #d1d5db;
+    }
+</style>
     <div class="overflow-hidden">
         <div class="p-4 text-gray-900 dark:text-gray-100 overflow-x-auto flex flex-col items-center">
             @if ($invoices->isNotEmpty())
@@ -87,9 +96,16 @@
     document.querySelectorAll('[id^="download-pdf-button-"]').forEach(function(button) {
         button.addEventListener('click', function() {
             const invoiceId = this.id.split('-').pop(); 
-            
-            document.getElementById('edit-button-' + invoiceId).disabled = true;
-            document.getElementById('delete-button-' + invoiceId).disabled = true;
+
+            const editButton = document.getElementById('edit-button-' + invoiceId);
+            const deleteButton = document.getElementById('delete-button-' + invoiceId);
+
+            [editButton, deleteButton].forEach(btn => {
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            });
         });
     });
 </script>
