@@ -46,7 +46,7 @@ Agrega la siguiente configuración a tu archivo de **User Settings (`settings.js
 <br>
 
 Ejemplos para probar la API GraphQL (método POST).  
-URL: http://127.0.0.1:8000/billing/graphql
+URL: http://127.0.0.1:8000/graphql
 
 ---
 
