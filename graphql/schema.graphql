@@ -60,29 +60,32 @@ type Client {
     status: Boolean!
     created_at: DateTime!
     updated_at: DateTime!
+
+    # Cambiamos la definición de la relación para que sea más explícita
+    invoices: [Invoice] 
 }
 
-type Invoice{
-    id: ID!,
-    client: Client @hasOne(relation: "client"),
-    payment_type: String!,
-    invoice_date: Date!,
-    total: Float!,
-    note: String,
+type Invoice {
+    id: ID!
+    client: Client @hasOne(relation: "client")
+    payment_type: String!
+    invoice_date: Date!
+    total: Float!
+    note: String
     details: [InvoiceDetails] @hasMany(relation: "details")
     created_at: DateTime!
     updated_at: DateTime!
 }
 
-type InvoiceDetails{
-    id: ID!,
-    invoice: Invoice @hasOne(relation: "invoice"),
-    product_id: ID!,
-    product_name: String!,
-    quantity: Int!,
-    unit_price: Float!,
-    subtotal: Float!,
-    created_at: DateTime!,
+type InvoiceDetails {
+    id: ID!
+    invoice: Invoice @hasOne(relation: "invoice")
+    product_id: ID!
+    product_name: String!
+    quantity: Int!
+    unit_price: Float!
+    subtotal: Float!
+    created_at: DateTime!
     updated_at: DateTime!
 }
 
@@ -99,10 +102,18 @@ type Query {
 
     invoices: [Invoice!]! @all @orderBy(column: "updated_at", direction: DESC)
     invoice(id: ID! @eq): Invoice @find
+
+    clientsWithCreditInvoices: [Client!]!
+        @field(
+            resolver: "App\\GraphQL\\Queries\\ClientQuery@clientsWithCreditInvoices"
+        )
+    clientWithCreditInvoices(id: String @eq): Client
+        @field(
+            resolver: "App\\GraphQL\\Queries\\ClientQuery@clientWithCreditInvoices"
+        )
 }
 
 type Mutation {
-
     createInvoice(input: CreateInvoiceInput! @spread): Invoice! @create
     updateInvoice(input: UpdateInvoiceInput! @spread): Invoice! @update
     deleteInvoice(id: ID! @whereKey): Invoice! @delete
@@ -115,8 +126,6 @@ type Mutation {
         @field(resolver: "App\\GraphQL\\Mutations\\ClientMutation@delete")
     restoreClient(id: ID!): Client
         @field(resolver: "App\\GraphQL\\Mutations\\ClientMutation@restore")
-
-
 }
 
 input InputCreateClient {
@@ -140,14 +149,12 @@ input InputUpdateClient {
     email: String
 }
 
-
 input CreateInvoiceDetailsInput {
     product_id: ID!
     product_name: String!
     quantity: Int!
     unit_price: Float!
     subtotal: Float
-
 }
 
 input CreateInvoiceDetailsHasMany {
@@ -163,7 +170,7 @@ input CreateInvoiceInput {
 }
 
 input UpdateInvoiceInput {
-    id: ID!,
+    id: ID!
     client_id: ID
     payment_type: String
     invoice_date: Date
@@ -175,7 +182,6 @@ input UpdateInvoiceDetailsHasMany {
     create: [CreateInvoiceDetailsInput!]
     update: [UpdateInvoiceDetailsInput!]
     delete: [ID!]
-   
 }
 
 input UpdateInvoiceDetailsInput {
@@ -185,5 +191,4 @@ input UpdateInvoiceDetailsInput {
     quantity: Int
     unit_price: Float
     subtotal: Float
-
 }
