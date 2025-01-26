@@ -295,5 +295,20 @@
     "Includes APIs for:": "Incluye APIs para:",
     "Stock inquiry": "Consulta de stock",
     "Client and invoice listing": "Listado de clientes y facturas",
-    "Audit trails": "Pistas de auditoría"
+    "Audit trails": "Pistas de auditoría",
+    "Manage Charts": "Administrar Gráficos",
+    "Start Date": "Fecha Inicio",
+    "End Date": "Fecha Fin",
+    "Monthly Sales": "Ventas Mensuales",
+    "Payment Types": "Tipos de Pago",
+    "Top Clients": "Clientes Top",
+    "Top 10 Clients by Total Sales": "Top 10 Clientes por Ventas Totales",
+    "Total Sales ($)": "Ventas Totales ($)",
+    "Sales": "Ventas",
+    "Total Monthly Sales": "Ventas Totales por Mes",
+    "Total Sales": "Ventas Totales",
+    "Month": "Mes",
+    "Payment Type Distribution": "Distribución de Tipos de Pago",
+    "Start date:": "Fecha Inicio:",
+    "End date:": "Fecha Fin:"
 }

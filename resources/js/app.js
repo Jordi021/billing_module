@@ -20,6 +20,8 @@ window.toggleTheme = () => {
     const isDark = html.classList.toggle('dark');
     localStorage.setItem('dark', isDark);
     updateThemeIcon(isDark);
+    
+    window.dispatchEvent(new CustomEvent('theme-changed', { detail: { isDark } }));
 };
 
 document.addEventListener('DOMContentLoaded', () => {

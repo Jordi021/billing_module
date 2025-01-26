@@ -27,7 +27,7 @@ $logout = function (Logout $logout) {
                         {{ __('Dashboard') }}
                     </x-nav-link>
                     <x-nav-link :href="route('clients')" :active="request()->routeIs('clients')">
-                        {{ __('Clientes') }}
+                        {{ __('Clients') }}
                     </x-nav-link>
                     <x-nav-link :href="route('invoices')" :active="request()->routeIs('invoices')">
                         {{ __('Invoices') }}

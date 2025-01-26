@@ -15,7 +15,8 @@
                     <thead class="bg-gray-50 dark:bg-gray-700">
                         <tr>
                             @foreach (['ID', 'Client', 'Payment Type', 'Date', 'Note', 'Details', 'Total', 'Actions'] as $header)
-                                <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                <th scope="col"
+                                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                     {{ __($header) }}
                                 </th>
                             @endforeach
@@ -56,31 +57,28 @@
                                         wire:click="$dispatch('details-modal', { invoiceId: '{{ $invoice->id }}' })" />
                                 </td>
 
-                                <td class="px-4 py-2 whitespace-nowrap">{{ $invoice['total'] ? '$'.$invoice['total'] : '$0' }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap">
+                                    {{ $invoice['total'] ? '$' . $invoice['total'] : '$0' }}</td>
 
                                 <td class="px-4 py-2 whitespace-nowrap">
-                                    <div class="flex gap-1">
-                                        <a href="{{ URL('invoices/pdf/' . $invoice->id) }}" 
-                                           class="inline-flex items-center px-3 py-2 bg-blue-500 text-white rounded-md text-sm font-semibold hover:bg-blue-600 focus:ring focus:ring-blue-300 transition"
-                                           id="download-pdf-button-{{ $invoice->id }}">
-                                           <i class="fas fa-file-pdf"></i>
+                                    <div class="flex gap-3">
+
+                                        <a href="{{ URL('invoices/pdf/' . $invoice->id) }}"
+                                            class="inline-flex items-center px-3 py-2 bg-blue-500 text-white rounded-md text-sm font-semibold hover:bg-blue-600 focus:ring focus:ring-blue-300 transition"
+                                            id="download-pdf-button-{{ $invoice->id }}">
+                                            <i class="fas fa-file-pdf"></i>
                                         </a>
+                                        <div class="flex gap-1">
+                                            <x-custom-button :disabled="session('locked_invoice_' . $invoice->id)"
+                                                color="{{ session('locked_invoice_' . $invoice->id) ? 'bg-gray-400' : 'bg-indigo-400' }}"
+                                                icon="fa fa-pencil" id="edit-button-{{ $invoice->id }}"
+                                                wire:click="$dispatch('invoice-edit', { invoice: {{ $invoice }}, details: {{ $invoice->details }} })" />
 
-                                        <x-custom-button 
-                                            :disabled="session('locked_invoice_' . $invoice->id)" 
-                                            color="{{ session('locked_invoice_' . $invoice->id) ? 'bg-gray-400' : 'bg-indigo-400' }}" 
-                                            icon="fa fa-pencil"
-                                            id="edit-button-{{ $invoice->id }}" 
-                                            wire:click="$dispatch('invoice-edit', { invoice: {{ $invoice }}, details: {{$invoice->details}} })" 
-                                        />
-
-                                        <x-custom-button 
-                                            :disabled="session('locked_invoice_' . $invoice->id)" 
-                                            color="{{ session('locked_invoice_' . $invoice->id) ? 'bg-gray-400' : 'bg-red-400' }}" 
-                                            icon="fas fa-trash"
-                                            id="delete-button-{{ $invoice->id }}" 
-                                            wire:click="$dispatch('invoice-confirm', {invoice: {{ $invoice }} })" 
-                                        />
+                                            <x-custom-button :disabled="session('locked_invoice_' . $invoice->id)"
+                                                color="{{ session('locked_invoice_' . $invoice->id) ? 'bg-gray-400' : 'bg-red-400' }}"
+                                                icon="fas fa-trash" id="delete-button-{{ $invoice->id }}"
+                                                wire:click="$dispatch('invoice-confirm', {invoice: {{ $invoice }} })" />
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
@@ -102,7 +100,7 @@
 <script>
     document.querySelectorAll('[id^="download-pdf-button-"]').forEach(function(button) {
         button.addEventListener('click', function() {
-            const invoiceId = this.id.split('-').pop(); 
+            const invoiceId = this.id.split('-').pop();
 
             const editButton = document.getElementById('edit-button-' + invoiceId);
             const deleteButton = document.getElementById('delete-button-' + invoiceId);
