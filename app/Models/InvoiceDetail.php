@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class InvoiceDetail extends Model
-{
+class InvoiceDetail extends Model implements Auditable {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'invoice_details';
 
@@ -18,11 +19,10 @@ class InvoiceDetail extends Model
         'product_name',
         'quantity',
         'unit_price',
-        'subtotal'
+        'subtotal',
     ];
 
-    public function invoice(): BelongsTo
-    {
+    public function invoice(): BelongsTo {
         return $this->belongsTo(Invoice::class);
     }
 }
