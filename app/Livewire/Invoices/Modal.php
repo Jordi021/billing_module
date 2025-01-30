@@ -179,6 +179,17 @@ class Modal extends Component {
         );
     }
 
+    public function updateQuantity($index, $newQuantity) {
+        if ($newQuantity < 1) return;
+        
+        $this->form->details[$index]['quantity'] = $newQuantity;
+        $this->form->details[$index]['subtotal'] = 
+            $this->form->details[$index]['quantity'] * 
+            $this->form->details[$index]['unit_price'];
+        
+        $this->form->total = collect($this->form->details)->sum('subtotal');
+    }
+
     private function resetInputs() {
         $this->selectedProduct = '';
         $this->quantity = 1;

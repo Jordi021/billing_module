@@ -10,16 +10,17 @@ const ICONS = {
     light: 'fa-solid fa-sun',
 };
 
-const updateThemeIcon = (isDark) => {
-    const themeIcon = document.getElementById('theme-icon');
-    if (!themeIcon) return;
-    themeIcon.className = isDark ? ICONS.dark : ICONS.light;
+const updateThemeIcons = (isDark) => {
+    const themeIcons = document.querySelectorAll('.theme-icon');
+    themeIcons.forEach(icon => {
+        icon.className = `theme-icon ${isDark ? ICONS.dark : ICONS.light}`;
+    });
 };
 
 window.toggleTheme = () => {
     const isDark = html.classList.toggle('dark');
     localStorage.setItem('dark', isDark);
-    updateThemeIcon(isDark);
+    updateThemeIcons(isDark);
     
     window.dispatchEvent(new CustomEvent('theme-changed', { detail: { isDark } }));
 };
@@ -28,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const isDark = localStorage.getItem('dark') === 'true';
 
     html.classList.toggle('dark', isDark);
-    updateThemeIcon(isDark);
+    updateThemeIcons(isDark);
 });
 
 window.TomSelect = TomSelect;

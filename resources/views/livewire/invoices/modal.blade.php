@@ -27,122 +27,137 @@
         </div>
 
         <div class="mb-4">
-            <p class="block  font-bold text-gray-700 dark:text-gray-300">
+            <p class="block font-bold text-gray-700 dark:text-gray-300">
                 {{ __('Details') }}
             </p>
             <x-input-error :messages="$errors->get('form.details')" class="mt-2" />
             <x-input-error :messages="$errors->get('form.total')" class="mt-2" />
 
-            <label for="product" class="mt-4 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {{ __('Product') }}
-            </label>
-
-            <div class="space-y-4">
-                <div class="flex items-center w-full gap-4">
-                    <div class="flex-grow" wire:ignore>
-                        <select id="select-product" name="product" multiple autocomplete="off"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white">
+            <!-- Rediseño del selector de productos -->
+            <div class="mt-4 space-y-3">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+                    <div class="md:col-span-9" wire:ignore>
+                        <select id="select-product" name="product" multiple autocomplete="off" class="w-full">
                         </select>
                     </div>
-                    <div class="w-24">
-                        <input type="number" id="qty-input" min="1" placeholder="Qty"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white dark:border-gray-600" />
-                    </div>
-                    <div class="flex-shrink-0">
+                    <div class="md:col-span-3 flex items-center space-x-2" wire:ignore>
+                        <div class="flex items-center border dark:border-gray-600 rounded-lg w-auto">
+                            <button type="button" onclick="decrementQuantity()" id="btn-decrease"
+                                class="px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-l-lg disabled:opacity-40 disabled:cursor-not-allowed dark:text-white"
+                                disabled>
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="text" id="qty-input" disabled
+                                class="w-12 text-center border-none focus:ring-0 dark:bg-gray-800 dark:text-white" />
+                            <button type="button" onclick="incrementQuantity()" id="btn-increase"
+                                class="px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-r-lg disabled:opacity-40 disabled:cursor-not-allowed dark:text-white"
+                                disabled>
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
                         <button id="add-btn" type="button"
-                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                            class="w-10 h-10 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm inline-flex items-center justify-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
-
-            <input type="hidden" id="details-input" name="details" wire:model="form.details">
-            <input type="hidden" id="total-input" name="total" wire:model="form.total">
-
-            <!-- Details Table -->
-            <div class="overflow-y-auto max-h-72 mt-4">
-                <table id="details-table" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-700">
-                        <tr>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                ID
-                            </th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('Product') }}
-                            </th>
-                            <th
-                                class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('Price') }}
-                            </th>
-                            <th
-                                class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('Quantity') }}
-                            </th>
-                            <th
-                                class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('Subtotal') }}
-                            </th>
-                            <th
-                                class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="details-table"
-                        class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-800">
-                        @if (!empty($form->details) && is_array($form->details))
-                            @foreach ($form->details as $index => $detail)
-                                <tr wire:key="detail-{{ $detail['product_id'] }}">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                                        {{ $detail['product_id'] }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                                        {{ $detail['product_name'] }}</td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-200">
-                                        ${{ number_format($detail['unit_price'], 2) }}</td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-200">
-                                        {{ $detail['quantity'] }}</td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-200">
-                                        ${{ number_format($detail['subtotal'], 2) }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button type="button" wire:click="removeDetail({{ $index }})"
-                                            class="text-red-600 hover:text-red-900 dark:hover:text-red-400">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
+            <!-- Tabla responsiva -->
+            <div class="mt-4">
+                <div>
+                    <table class="table-auto w-full whitespace-normal break-words">
+                        <thead class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                <th class="px-2 py-3 w-10"></th>
+                                <th
+                                    class="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase max-w-[200px] lg:max-w-[300px]">
+                                    {{ __('Product') }}
+                                </th>
+                                <th
+                                    class="px-2 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase w-20 sm:w-24 sm:px-4">
+                                    {{ __('Price') }}
+                                </th>
+                                <th
+                                    class="px-2 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase w-24 sm:w-32 sm:px-4">
+                                    {{ __('Quantity') }}
+                                </th>
+                                <th
+                                    class="px-2 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase w-20 sm:w-24 sm:px-4">
+                                    {{ __('Subtotal') }}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-800">
+                            @if (!empty($form->details) && is_array($form->details))
+                                @foreach ($form->details as $index => $detail)
+                                    <tr wire:key="detail-{{ $detail['product_id'] }}">
+                                        <td class="px-2 py-3 text-left sm:px-4">
+                                            <button type="button" wire:click="removeDetail({{ $index }})"
+                                                class="text-red-600 hover:text-red-900 dark:hover:text-red-400">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                        <td class="px-2 py-3 text-sm text-gray-900 dark:text-gray-200 sm:px-4">
+                                            <div class="truncate w-[100px] sm:w-[180px] md:w-[220px] lg:w-[280px] xl:w-[320px]"
+                                                title="{{ $detail['product_name'] }}">
+                                                {{ $detail['product_name'] }}
+                                            </div>
+                                        </td>
+                                        <td
+                                            class="px-2 py-3 text-sm text-right text-gray-900 dark:text-gray-200 sm:px-4">
+                                            ${{ number_format($detail['unit_price'], 2) }}
+                                        </td>
+                                        <td class="px-2 py-3 sm:px-4">
+                                            <div class="flex items-center justify-center space-x-1">
+                                                <button type="button"
+                                                    wire:click="updateQuantity({{ $index }}, {{ $detail['quantity'] - 1 }})"
+                                                    class="p-1 text-gray-500 
+                                                    hover:text-gray-700 dark:hover:text-gray-400 dark:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:dark:bg-gray-700 disabled:bg-gray-200"
+                                                    {{ $detail['quantity'] <= 1 ? 'disabled' : '' }} >
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                                <span
+                                                    class="text-sm text-gray-900 dark:text-gray-200 w-8 text-center">
+                                                    {{ $detail['quantity'] }}
+                                                </span>
+                                                <button type="button"
+                                                    wire:click="updateQuantity({{ $index }}, {{ $detail['quantity'] + 1 }})"
+                                                    class="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-200
+                                                    dark:hover:text-gray-400">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td
+                                            class="px-2 py-3 text-sm text-right text-gray-900 dark:text-gray-200 sm:px-4">
+                                            ${{ number_format($detail['subtotal'], 2) }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="5"
+                                        class="px-2 py-3 text-center text-gray-500 dark:text-gray-400 sm:px-4">
+                                        {{ __('No details available.') }}
                                     </td>
                                 </tr>
-                            @endforeach
-                        @else
+                            @endif
+                        </tbody>
+                        <tfoot class="bg-gray-50 dark:bg-gray-700">
                             <tr>
-                                <td colspan="6" class="text-center text-gray-500 dark:text-gray-400">
-                                    {{ __('No details available.') }}
+                                <td colspan="4"
+                                    class="px-2 py-3 text-right text-sm font-medium text-gray-900 dark:text-gray-200 sm:px-4">
+                                    Total:
+                                </td>
+                                <td
+                                    class="px-2 py-3 text-right text-sm font-medium text-gray-900 dark:text-gray-200 sm:px-4">
+                                    ${{ number_format($form->total ?? 0, 2) }}
                                 </td>
                             </tr>
-                        @endif
-                    </tbody>
-
-
-
-                    <tfoot class="bg-gray-50 dark:bg-gray-700">
-                        <tr>
-                            <td colspan="4"
-                                class="px-6 py-4 text-right text-sm font-medium text-gray-900 dark:text-gray-200">Total:
-                            </td>
-                            <td id="total-invoice"
-                                class="px-6 py-4 text-right text-sm font-medium text-gray-900 dark:text-gray-200">
-                                @if (!empty($form->total))
-                                    ${{ number_format($form->total, 2) }}
-                                @endif
-                            </td>
-                            <td></td>
-                        </tr>
-                    </tfoot>
-                </table>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -172,7 +187,11 @@
     });
 
     document.addEventListener('livewire:init', function() {
-        initializeTomSelect();
+        // Evita llamar initializeTomSelect() aquí, para no sobrescribir tu configuración
+
+        // Quita esta línea o coméntala si repetía la inicialización
+        // initializeTomSelect();
+
         //console.log("Livewire init event triggered");
 
         // Re-attach the event listener to the Add button after Livewire components load
@@ -258,21 +277,45 @@
                 maxItems: 1,
                 render: {
                     option: function(data, escape) {
-                        return `<div class="flex justify-between items-center py-2">
-                                <span class="text-sm">${escape(data.title)}</span>
-                                <span class="text-sm font-semibold">$${escape(data.price)}</span>
-                            </div>`;
+                        return `<div class="flex flex-col py-2">
+                            <span class="text-sm font-medium">${escape(data.title)}</span>
+                            <span class="text-xs text-green-600 dark:text-green-400">$${escape(data.price)}</span>
+                        </div>`;
                     },
                     item: function(data, escape) {
                         return `<div>
-                                <span class="text-sm">${escape(data.title)} - </span>
-                                <span class="text-sm font-semibold">$${escape(data.price)}</span>
-                            </div>`;
+                        <span class="text-sm font-medium">${escape(data.title)}</span>
+                    </div>`;
                     },
                 },
                 onChange: function(value) {
                     console.log("Product changed:", value);
                     @this.set('selectedProduct', value);
+
+                    const qtyInput = document.getElementById('qty-input');
+                    const btnDecrease = document.getElementById('btn-decrease');
+                    const btnIncrease = document.getElementById('btn-increase');
+
+                    if (btnDecrease && btnIncrease) {
+                        if (value) {
+                            qtyInput.value = '1';
+                            btnDecrease.disabled = true;
+                            btnIncrease.disabled = false;
+                        } else {
+                            qtyInput.value = '';
+                            btnDecrease.disabled = true;
+                            btnIncrease.disabled = true;
+                        }
+                    }
+                },
+                onClear: function() {
+                    console.log("Product cleared");
+                    @this.set('selectedProduct', null);
+
+                    // Quita o comenta esto para no forzar la deshabilitación
+                    // btnIncrease.disabled = true;
+                    // btnDecrease.disabled = true;
+                    // qtyInput.value = '';
                 },
             });
         }
@@ -291,6 +334,10 @@
     function handleAddButtonClick() {
         const selectProduct = document.querySelector('#select-product');
         const qtyInput = document.getElementById('qty-input');
+
+        // Referenciamos btnDecrease y btnIncrease aquí
+        const btnDecrease = document.getElementById('btn-decrease');
+        const btnIncrease = document.getElementById('btn-increase');
 
         if (!selectProduct || !qtyInput || !selectProduct.tomselect) {
             alert('Please ensure the product selector and quantity input are correctly initialized.');
@@ -319,10 +366,41 @@
         const quantity = parseInt(qtyInput.value);
 
         // Call Livewire method
-        @this.call('addDetail', selectedProductId, quantity);
+        @this.call('addDetail', selectedProductId, quantity).then(() => {
+            // Resetea todo
+            productInstance.clear();
+            qtyInput.value = '';
+            qtyInput.disabled = true;
+            btnDecrease.disabled = true;
+            btnIncrease.disabled = true;
+        });
+    }
 
-        // Clear inputs
-        qtyInput.value = '';
-        productInstance.clear();
+    function incrementQuantity() {
+        const qtyInput = document.getElementById('qty-input');
+        qtyInput.value = parseInt(qtyInput.value) + 1;
+        handleQuantityChange(qtyInput);
+    }
+
+    function decrementQuantity() {
+        const qtyInput = document.getElementById('qty-input');
+        const newValue = parseInt(qtyInput.value) - 1;
+        if (newValue >= 1) {
+            qtyInput.value = newValue;
+            handleQuantityChange(qtyInput);
+        }
+    }
+
+    function handleQuantityChange(input) {
+        const value = parseInt(input.value) || 1;
+        const btnDecrease = document.getElementById('btn-decrease');
+        const btnIncrease = document.getElementById('btn-increase');
+
+        if (value < 1) input.value = 1;
+
+        if (btnDecrease && btnIncrease) {
+            btnDecrease.disabled = input.value <= 1; // sigue deshabilitado si es 1
+            btnIncrease.disabled = false;
+        }
     }
 </script>

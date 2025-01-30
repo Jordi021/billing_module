@@ -128,6 +128,7 @@
     "Invalid JSON was returned from the route.": "Se devolvió un JSON no válido desde la ruta.",
     "Invalid SSL Certificate": "Certificado SSL no válido",
     "Invoices": "Facturas",
+    "Invoice_ID": "ID Factura",
     "Last Name": "Apellido",
     "length": "longitud",
     "Length Required": "Longitud requerida",

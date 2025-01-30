@@ -40,7 +40,7 @@
     </div>
 
     <!-- Gráfico de Barras separado para mejor visualización en móvil -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 border border-gray-200 dark:border-gray-700 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 border border-gray-200 dark:border-gray-700">
         <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">{{ __('Top Clients') }}</h3>
         <div class="h-[400px]" wire:ignore>
             <canvas id="barChart"></canvas>

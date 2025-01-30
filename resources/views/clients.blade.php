@@ -17,7 +17,7 @@
     </div>
 
     <!-- Modal Component -->
-    <x-modal name="client-modal" :show="false" focusable>
+    <x-modal name="client-modal" :show="false" maxWidth="lg" focusable>
         <livewire:clients.modal />
     </x-modal>
     <x-modal name="client-modal-confirmation" maxWidth="lg" :show="false" focusable>
