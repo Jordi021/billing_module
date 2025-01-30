@@ -49,7 +49,7 @@ class Charts extends Component {
                 DB::raw('COUNT(invoices.id) as total_invoices')
             )
             ->groupBy('clients.id', 'clients.name', 'clients.last_name')
-            ->orderByDesc(DB::raw('SUM(invoices.total)')) 
+            ->orderByDesc(DB::raw('SUM(invoices.total)'))
             ->limit(10)
             ->get();
 

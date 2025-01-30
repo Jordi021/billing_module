@@ -4,20 +4,22 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAuditsTable extends Migration
-{
+class CreateAuditsTable extends Migration {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
-    {
-        $connection = config('audit.drivers.database.connection', config('database.default'));
+    public function up() {
+        $connection = config(
+            'audit.drivers.database.connection',
+            config('database.default')
+        );
         $table = config('audit.drivers.database.table', 'audits');
 
-        Schema::connection($connection)->create($table, function (Blueprint $table) {
-
+        Schema::connection($connection)->create($table, function (
+            Blueprint $table
+        ) {
             $morphPrefix = config('audit.user.morph_prefix', 'user');
 
             $table->bigIncrements('id');
@@ -42,9 +44,11 @@ class CreateAuditsTable extends Migration
      *
      * @return void
      */
-    public function down()
-    {
-        $connection = config('audit.drivers.database.connection', config('database.default'));
+    public function down() {
+        $connection = config(
+            'audit.drivers.database.connection',
+            config('database.default')
+        );
         $table = config('audit.drivers.database.table', 'audits');
 
         Schema::connection($connection)->drop($table);

@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Http\Requests\ClientRequest;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+//use OwenIt\Auditing\Models\Audit;
 
 class ClientController extends Controller {
     /**
