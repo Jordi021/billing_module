@@ -70,20 +70,16 @@
                         <thead class="bg-gray-50 dark:bg-gray-700">
                             <tr>
                                 <th class="px-2 py-3 w-10"></th>
-                                <th
-                                    class="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase max-w-[200px] lg:max-w-[300px]">
+                                <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase max-w-[200px] lg:max-w-[300px]">
                                     {{ __('Product') }}
                                 </th>
-                                <th
-                                    class="px-2 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase w-20 sm:w-24 sm:px-4">
+                                <th class="px-2 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase w-20 sm:w-24 sm:px-4">
                                     {{ __('Price') }}
                                 </th>
-                                <th
-                                    class="px-2 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase w-24 sm:w-32 sm:px-4">
+                                <th class="px-2 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase w-24 sm:w-32 sm:px-4">
                                     {{ __('Quantity') }}
                                 </th>
-                                <th
-                                    class="px-2 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase w-20 sm:w-24 sm:px-4">
+                                <th class="px-2 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase w-20 sm:w-24 sm:px-4">
                                     {{ __('Subtotal') }}
                                 </th>
                             </tr>
@@ -104,41 +100,36 @@
                                                 {{ $detail['product_name'] }}
                                             </div>
                                         </td>
-                                        <td
-                                            class="px-2 py-3 text-sm text-right text-gray-900 dark:text-gray-200 sm:px-4">
+                                        <td class="px-2 py-3 text-sm text-right text-gray-900 dark:text-gray-200 sm:px-4">
                                             ${{ number_format($detail['unit_price'], 2) }}
+                                            <span class="text-xs text-gray-500 block sm:inline-block">+{{ $detail['vat_percentage'] }}%</span>
                                         </td>
                                         <td class="px-2 py-3 sm:px-4">
                                             <div class="flex items-center justify-center space-x-1">
                                                 <button type="button"
                                                     wire:click="updateQuantity({{ $index }}, {{ $detail['quantity'] - 1 }})"
-                                                    class="p-1 text-gray-500 
-                                                    hover:text-gray-700 dark:hover:text-gray-400 dark:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:dark:bg-gray-700 disabled:bg-gray-200"
-                                                    {{ $detail['quantity'] <= 1 ? 'disabled' : '' }} >
+                                                    class="p-1 text-gray-500 hover:text-gray-700 dark:hover:text-gray-400 dark:text-gray-200 {{ $detail['quantity'] <= 1 ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                                    {{ $detail['quantity'] <= 1 ? 'disabled' : '' }}>
                                                     <i class="fas fa-minus"></i>
                                                 </button>
-                                                <span
-                                                    class="text-sm text-gray-900 dark:text-gray-200 w-8 text-center">
+                                                <span class="text-sm text-gray-900 dark:text-gray-200 w-8 text-center">
                                                     {{ $detail['quantity'] }}
                                                 </span>
                                                 <button type="button"
                                                     wire:click="updateQuantity({{ $index }}, {{ $detail['quantity'] + 1 }})"
-                                                    class="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-200
-                                                    dark:hover:text-gray-400">
+                                                    class="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-200 dark:hover:text-gray-400">
                                                     <i class="fas fa-plus"></i>
                                                 </button>
                                             </div>
                                         </td>
-                                        <td
-                                            class="px-2 py-3 text-sm text-right text-gray-900 dark:text-gray-200 sm:px-4">
-                                            ${{ number_format($detail['subtotal'], 2) }}
+                                        <td class="px-2 py-3 text-sm text-right text-gray-900 dark:text-gray-200 sm:px-4">
+                                            ${{ number_format($detail['subtotal'] + $detail['vat_amount'], 2) }}
                                         </td>
                                     </tr>
                                 @endforeach
                             @else
                                 <tr>
-                                    <td colspan="5"
-                                        class="px-2 py-3 text-center text-gray-500 dark:text-gray-400 sm:px-4">
+                                    <td colspan="5" class="px-2 py-3 text-center text-gray-500 dark:text-gray-400 sm:px-4">
                                         {{ __('No details available.') }}
                                     </td>
                                 </tr>
@@ -146,12 +137,10 @@
                         </tbody>
                         <tfoot class="bg-gray-50 dark:bg-gray-700">
                             <tr>
-                                <td colspan="4"
-                                    class="px-2 py-3 text-right text-sm font-medium text-gray-900 dark:text-gray-200 sm:px-4">
+                                <td colspan="4" class="px-2 py-3 text-right text-sm font-medium text-gray-900 dark:text-gray-200 sm:px-4">
                                     Total:
                                 </td>
-                                <td
-                                    class="px-2 py-3 text-right text-sm font-medium text-gray-900 dark:text-gray-200 sm:px-4">
+                                <td class="px-2 py-3 text-right text-sm font-medium text-gray-900 dark:text-gray-200 sm:px-4">
                                     ${{ number_format($form->total ?? 0, 2) }}
                                 </td>
                             </tr>
@@ -270,7 +259,7 @@
             new TomSelect(selectProduct, {
                 valueField: 'id',
                 labelField: 'title',
-                searchField: 'title',
+                searchField: ['title', 'code', 'description'], // Agregamos description para búsqueda
                 options: @json($products),
                 persist: false,
                 create: false,
@@ -278,15 +267,35 @@
                 render: {
                     option: function(data, escape) {
                         return `<div class="flex flex-col py-2">
-                            <span class="text-sm font-medium">${escape(data.title)}</span>
-                            <span class="text-xs text-green-600 dark:text-green-400">$${escape(data.price)}</span>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium dark:text-gray-200">${escape(data.title)}</span>
+                                <div class="text-right">
+                                    <span class="text-xs text-green-600 dark:text-green-400">$${escape(data.price)}</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 ml-1">+${escape(data.vat_percentage)}%</span>
+                                </div>
+                            </div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                ${escape(data.description)}
+                            </div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                Stock: ${escape(data.stock)}
+                            </div>
                         </div>`;
                     },
                     item: function(data, escape) {
-                        return `<div>
-                        <span class="text-sm font-medium">${escape(data.title)}</span>
-                    </div>`;
-                    },
+                        return `<div class="flex justify-between items-center">
+                            <span class="text-sm font-medium dark:text-gray-200">${escape(data.title)}</span>
+                        </div>`;
+                    }
+                },
+                shouldLoad: function() {
+                    return true; // Always load options
+                },
+                load: function(query, callback) {
+                    callback(this.options); // Load all options
+                },
+                score: function(search) {
+                    return this.getScoreFunction(search); // Removida toda la lógica de filtrado
                 },
                 onChange: function(value) {
                     console.log("Product changed:", value);
@@ -296,12 +305,14 @@
                     const btnDecrease = document.getElementById('btn-decrease');
                     const btnIncrease = document.getElementById('btn-increase');
 
-                    if (btnDecrease && btnIncrease) {
+                    if (qtyInput && btnDecrease && btnIncrease) {
                         if (value) {
+                            qtyInput.disabled = false;
                             qtyInput.value = '1';
                             btnDecrease.disabled = true;
                             btnIncrease.disabled = false;
                         } else {
+                            qtyInput.disabled = true;
                             qtyInput.value = '';
                             btnDecrease.disabled = true;
                             btnIncrease.disabled = true;
@@ -312,11 +323,17 @@
                     console.log("Product cleared");
                     @this.set('selectedProduct', null);
 
-                    // Quita o comenta esto para no forzar la deshabilitación
-                    // btnIncrease.disabled = true;
-                    // btnDecrease.disabled = true;
-                    // qtyInput.value = '';
-                },
+                    const qtyInput = document.getElementById('qty-input');
+                    const btnDecrease = document.getElementById('btn-decrease');
+                    const btnIncrease = document.getElementById('btn-increase');
+
+                    if (qtyInput && btnDecrease && btnIncrease) {
+                        qtyInput.disabled = true;
+                        qtyInput.value = '';
+                        btnDecrease.disabled = true;
+                        btnIncrease.disabled = true;
+                    }
+                }
             });
         }
     }

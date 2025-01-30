@@ -62,15 +62,14 @@ type Client {
     updated_at: DateTime!
 
     # Cambiamos la definición de la relación para que sea más explícita
-    invoices: [Invoice] 
+    invoices: [Invoice]
 }
 
 type Invoice {
     id: ID!
-    client: Client @hasOne(relation: "client")
     payment_type: String!
     invoice_date: Date!
-    total: Float
+    total: Float!
     note: String
     details: [InvoiceDetails] @hasMany(relation: "details")
     created_at: DateTime!
@@ -79,12 +78,11 @@ type Invoice {
 
 type InvoiceDetails {
     id: ID!
-    invoice: Invoice @hasOne(relation: "invoice")
     product_id: ID!
-    product_name: String!
     quantity: Int!
     unit_price: Float!
     subtotal: Float!
+    vat_amount: Float!
     created_at: DateTime!
     updated_at: DateTime!
 }
@@ -103,6 +101,10 @@ type Query {
     invoices: [Invoice!]! @all @orderBy(column: "updated_at", direction: DESC)
     invoice(id: ID! @eq): Invoice @find
 
+    clientsWithAllInvoices: [Client!]!
+        @field(
+            resolver: "App\\GraphQL\\Queries\\ClientQuery@clientsWithAllInvoices"
+        )
     clientsWithCreditInvoices: [Client!]!
         @field(
             resolver: "App\\GraphQL\\Queries\\ClientQuery@clientsWithCreditInvoices"
@@ -112,8 +114,14 @@ type Query {
             resolver: "App\\GraphQL\\Queries\\ClientQuery@clientWithCreditInvoices"
         )
 
+    creditInvoices: [Invoice!]!
+        @all
+        @where(key: "payment_type", value: "credit")
 
-    creditInvoices: [Invoice!]! @all @where(key: "payment_type", value: "credit")    
+    clientWithAllInvoices(id: String @eq): Client
+        @field(
+            resolver: "App\\GraphQL\\Queries\\ClientQuery@clientWithAllInvoices"
+        )
 }
 
 type Mutation {
@@ -154,10 +162,10 @@ input InputUpdateClient {
 
 input CreateInvoiceDetailsInput {
     product_id: ID!
-    product_name: String!
     quantity: Int!
     unit_price: Float!
-    subtotal: Float
+    subtotal: Float!
+    vat_amount: Float!
 }
 
 input CreateInvoiceDetailsHasMany {
@@ -169,6 +177,7 @@ input CreateInvoiceInput {
     payment_type: String!
     invoice_date: Date!
     total: Float!
+    note: String
     details: CreateInvoiceDetailsHasMany
 }
 
@@ -190,8 +199,8 @@ input UpdateInvoiceDetailsHasMany {
 input UpdateInvoiceDetailsInput {
     id: ID!
     product_id: ID
-    product_name: String
     quantity: Int
     unit_price: Float
     subtotal: Float
+    vat_amount: Float
 }

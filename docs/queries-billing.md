@@ -5,7 +5,85 @@ Base URL: https://billingmodule.lat/graphql
 
 ## Available Queries
 
-### 1. Get Specific Client with Credit Invoices
+### 1. Get All Clients with Their Invoices
+
+```graphql
+query {
+    clientsWithAllInvoices {
+        id
+        name
+        last_name
+        birth_date
+        client_type
+        address
+        phone
+        email
+        status
+        created_at
+        updated_at
+        invoices {
+            id
+            payment_type
+            invoice_date
+            total
+            note
+            created_at
+            updated_at
+            details {
+                id
+                product_id
+                quantity
+                unit_price
+                subtotal
+                vat_amount
+                created_at
+                updated_at
+            }
+        }
+    }
+}
+```
+
+### 2. Get Single Client with All Invoices
+
+```graphql
+query {
+    clientWithAllInvoices(id: "1234567890") {
+        id
+        name
+        last_name
+        birth_date
+        client_type
+        address
+        phone
+        email
+        status
+        created_at
+        updated_at
+        invoices {
+            id
+            payment_type
+            invoice_date
+            total
+            note
+            created_at
+            updated_at
+            details {
+                id
+                product_id
+                quantity
+                unit_price
+                subtotal
+                vat_amount
+                created_at
+                updated_at
+            }
+        }
+    }
+}
+```
+
+### 3. Get Specific Client with Credit Invoices
 
 ```graphql
 query {
@@ -32,10 +110,10 @@ query {
             details {
                 id
                 product_id
-                product_name
                 quantity
                 unit_price
                 subtotal
+                vat_amount
                 created_at
                 updated_at
             }
@@ -44,7 +122,7 @@ query {
 }
 ```
 
-### 2. Get Clients with Credit Invoices
+### 4. Get Clients with Credit Invoices
 
 ```graphql
 query {
@@ -71,10 +149,10 @@ query {
             details {
                 id
                 product_id
-                product_name
                 quantity
                 unit_price
                 subtotal
+                vat_amount
                 created_at
                 updated_at
             }
@@ -83,7 +161,7 @@ query {
 }
 ```
 
-### 3. Get Single Invoice
+### 5. Get Single Invoice
 
 ```graphql
 query {
@@ -95,26 +173,13 @@ query {
         note
         created_at
         updated_at
-        client {
-            id
-            name
-            last_name
-            birth_date
-            client_type
-            address
-            phone
-            email
-            status
-            created_at
-            updated_at
-        }
         details {
             id
             product_id
-            product_name
             quantity
             unit_price
             subtotal
+            vat_amount
             created_at
             updated_at
         }
@@ -122,7 +187,7 @@ query {
 }
 ```
 
-### 4. Get All Invoices
+### 6. Get All Invoices
 
 ```graphql
 query {
@@ -134,26 +199,13 @@ query {
         note
         created_at
         updated_at
-        client {
-            id
-            name
-            last_name
-            birth_date
-            client_type
-            address
-            phone
-            email
-            status
-            created_at
-            updated_at
-        }
         details {
             id
             product_id
-            product_name
             quantity
             unit_price
             subtotal
+            vat_amount
             created_at
             updated_at
         }
@@ -161,7 +213,7 @@ query {
 }
 ```
 
-### 5. Get Inactive Clients
+### 7. Get Inactive Clients
 
 ```graphql
 query {
@@ -188,7 +240,7 @@ query {
 }
 ```
 
-### 6. Get Active Clients
+### 8. Get Active Clients
 
 ```graphql
 query {
@@ -215,7 +267,7 @@ query {
 }
 ```
 
-### 7. Get Credit Clients
+### 9. Get Credit Clients
 
 ```graphql
 query {
@@ -242,7 +294,7 @@ query {
 }
 ```
 
-### 8. Get Cash Clients
+### 10. Get Cash Clients
 
 ```graphql
 query {
@@ -269,7 +321,7 @@ query {
 }
 ```
 
-### 9. Get All Clients (Sorted by Creation Date)
+### 11. Get All Clients (Sorted by Creation Date)
 
 ```graphql
 query {
@@ -296,7 +348,7 @@ query {
 }
 ```
 
-### 10. Get Paginated Clients
+### 12. Get Paginated Clients
 
 ```graphql
 query {
@@ -332,7 +384,7 @@ query {
 }
 ```
 
-### 11. Get Single Client
+### 13. Get Single Client
 
 ```graphql
 query {
@@ -357,10 +409,10 @@ query {
             details {
                 id
                 product_id
-                product_name
                 quantity
                 unit_price
                 subtotal
+                vat_amount
                 created_at
                 updated_at
             }

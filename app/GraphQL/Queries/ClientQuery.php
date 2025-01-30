@@ -34,4 +34,22 @@ final readonly class ClientQuery {
             ])
             ->first();
     }
+
+    public function clientsWithAllInvoices($root, array $args) {
+        return Client::with(['invoices' => function ($query) {
+            $query->orderBy('created_at', 'desc')->with('details');
+        }])
+        ->whereHas('invoices')
+        ->get();
+    }
+
+    public function clientWithAllInvoices($root, array $args) {
+        $clientId = $args['id'];
+        
+        return Client::where('id', $clientId)
+            ->with(['invoices' => function ($query) {
+                $query->orderBy('created_at', 'desc')->with('details');
+            }])
+            ->first();
+    }
 }

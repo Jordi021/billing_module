@@ -26,24 +26,31 @@ class Modal extends Component {
     public function edit($invoice, $details) {
         $this->isEditing = true;
         $this->form->fill($invoice);
+
+        // Asegurarnos de tener los productos cargados
+        if (empty($this->products)) {
+            $this->fetchProducts();
+        }
+
         // Reset details to ensure it matches the database records
         $this->form->details = collect($details)
             ->map(function ($detail) {
+                // Buscar el producto en la lista de productos
+                $product = collect($this->products)->firstWhere('id', $detail['product_id']);
+                
                 return [
                     'product_id' => $detail['product_id'],
-                    'product_name' => $detail['product_name'],
+                    'product_name' => $product['title'] ?? 'Producto no encontrado', // Nombre del producto desde la API
                     'unit_price' => $detail['unit_price'],
                     'quantity' => $detail['quantity'],
                     'subtotal' => $detail['subtotal'],
+                    'vat_amount' => $detail['vat_amount'],
+                    'vat_percentage' => $product['vat_percentage'] ?? 0 // VAT desde la API
                 ];
             })
             ->toArray();
 
-        // $this->selectedClient = $invoice['client_id'];
-
         $this->dispatch('open-modal', 'invoice-modal');
-
-        // Dispatch event to fill client in the select
         $this->dispatch('fill-client-select', $invoice['client_id']);
     }
 
@@ -105,20 +112,31 @@ class Modal extends Component {
     public function fetchProducts() {
         try {
             $response = Http::withoutVerifying()->get(
-                'https://fakestoreapi.com/products'
+                'https://seashell-app-9et5v.ondigitalocean.app/api/productos'
             );
-            // Parse and map the products to include only id, title, and price
+            
             $this->products = collect($response->json())
                 ->map(function ($product) {
                     return [
-                        'id' => $product['id'],
-                        'title' => $product['title'],
-                        'price' => $product['price'],
+                        'id' => $product['Product_Id'],
+                        'code' => $product['Code'],
+                        'title' => $product['Name'],
+                        'description' => $product['Description'],
+                        'cost' => (float)$product['Cost'],
+                        'price' => (float)$product['Price'],
+                        'status' => $product['Status'],
+                        'stock' => $product['Stock'],
+                        'category_id' => $product['Category']['Category_Id'],
+                        'category_type' => $product['Category']['Type'],
+                        'vat_percentage' => $product['Category']['VAT']
                     ];
                 })
+                ->values()
                 ->toArray();
 
-            logger()->info('Mapped products:', ['products' => $this->products]);
+            logger()->info('Products fetched successfully', [
+                'count' => count($this->products)
+            ]);
         } catch (\Exception $e) {
             logger()->error('Error fetching products:', [
                 'message' => $e->getMessage(),
@@ -138,25 +156,33 @@ class Modal extends Component {
             return;
         }
 
-        $subtotal = $product['price'] * $quantity;
+        // IMPORTANTE: Validación de stock y estado comentada temporalmente para pruebas
+        // Descomentar estas líneas en producción o cuando haya productos con stock
+        /*
+        if (!$product['status'] || $product['stock'] < 1) {
+            return;
+        }
+        */
 
-        // Initialize details array if it's null
+        $subtotal = $product['price'] * $quantity;
+        $vatAmount = $subtotal * ($product['vat_percentage'] / 100);  
+
         if (!is_array($this->form->details)) {
             $this->form->details = [];
         }
 
-        // Check if product already exists
-        $existingIndex = collect($this->form->details)->search(function (
-            $detail
-        ) use ($productId) {
+        $existingIndex = collect($this->form->details)->search(function ($detail) use ($productId) {
             return $detail['product_id'] == $productId;
         });
 
         if ($existingIndex !== false) {
             $this->form->details[$existingIndex]['quantity'] += $quantity;
-            $this->form->details[$existingIndex]['subtotal'] =
-                $this->form->details[$existingIndex]['quantity'] *
+            $this->form->details[$existingIndex]['subtotal'] = 
+                $this->form->details[$existingIndex]['quantity'] * 
                 $this->form->details[$existingIndex]['unit_price'];
+            $this->form->details[$existingIndex]['vat_amount'] = 
+                $this->form->details[$existingIndex]['subtotal'] * 
+                ($this->form->details[$existingIndex]['vat_percentage'] / 100);
         } else {
             $this->form->details[] = [
                 'product_id' => $product['id'],
@@ -164,19 +190,26 @@ class Modal extends Component {
                 'unit_price' => $product['price'],
                 'quantity' => $quantity,
                 'subtotal' => $subtotal,
+                'vat_percentage' => $product['vat_percentage'],
+                'vat_amount' => $vatAmount  // Ahora sí agregamos el VAT calculado
             ];
         }
 
-        $this->form->total = collect($this->form->details)->sum('subtotal');
+        $this->form->total = collect($this->form->details)->sum(function($detail) {
+            return $detail['subtotal'] + $detail['vat_amount'];
+        });
+
+        $this->resetInputs();
     }
 
     public function removeDetail($index) {
         unset($this->form->details[$index]);
         $this->form->details = array_values($this->form->details); // Reindex the array
 
-        $this->form->total = array_sum(
-            array_column($this->form->details, 'subtotal')
-        );
+        // Corregir el cálculo del total para incluir VAT
+        $this->form->total = collect($this->form->details)->sum(function($detail) {
+            return $detail['subtotal'] + $detail['vat_amount'];
+        });
     }
 
     public function updateQuantity($index, $newQuantity) {
@@ -186,8 +219,13 @@ class Modal extends Component {
         $this->form->details[$index]['subtotal'] = 
             $this->form->details[$index]['quantity'] * 
             $this->form->details[$index]['unit_price'];
+        $this->form->details[$index]['vat_amount'] = 
+            $this->form->details[$index]['subtotal'] * 
+            ($this->form->details[$index]['vat_percentage'] / 100);
         
-        $this->form->total = collect($this->form->details)->sum('subtotal');
+        $this->form->total = collect($this->form->details)->sum(function($detail) {
+            return $detail['subtotal'] + $detail['vat_amount'];
+        });
     }
 
     private function resetInputs() {

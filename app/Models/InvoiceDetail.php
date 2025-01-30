@@ -16,11 +16,15 @@ class InvoiceDetail extends Model implements Auditable {
     protected $fillable = [
         'invoice_id',
         'product_id',
-        'product_name',
         'quantity',
         'unit_price',
         'subtotal',
+        'vat_amount',
     ];
+
+    public function getTotalWithVatAttribute(): float {
+        return $this->subtotal + $this->vat_amount;
+    }
 
     public function invoice(): BelongsTo {
         return $this->belongsTo(Invoice::class);
