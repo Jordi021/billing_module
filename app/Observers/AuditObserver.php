@@ -2,7 +2,9 @@
 
 namespace App\Observers;
 
-use App\Models\OwenIt\Auditing\Models\Audit;
+use OwenIt\Auditing\Models\Audit;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class AuditObserver {
     /**
@@ -14,19 +16,28 @@ class AuditObserver {
     public function created(Audit $audit) {
         $payload = $this->transformAuditData($audit);
 
-        $response = Http::post(
-            'https://seri-api-utn-2024.fly.dev/api/audit-logs',
-            $payload
-        );
+        try {
+            $response = Http::withHeaders([
+                'accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ])->post('https://seri-api-utn-2024.fly.dev/api/audit', $payload);
 
-        if ($response->failed()) {
-            Log::error(
-                'Error al enviar el registro de auditoría a la API de seguridad',
-                [
-                    'response' => $response->body(),
-                    'payload' => $payload,
-                ]
-            );
+            if ($response->failed()) {
+                Log::error(
+                    'Error al enviar el registro de auditoría a la API de seguridad',
+                    [
+                        'status' => $response->status(),
+                        'headers' => $response->headers(),
+                        'response' => $response->body(),
+                        'payload' => $payload,
+                    ]
+                );
+            }
+        } catch (\Exception $e) {
+            Log::error('Error inesperado al enviar el registro de auditoría', [
+                'exception' => $e->getMessage(),
+                'payload' => $payload,
+            ]);
         }
     }
 
@@ -49,9 +60,14 @@ class AuditObserver {
 
         if ($audit->event === 'updated') {
             $changes = [];
-            foreach ($audit->old_values as $key => $oldValue) {
-                $newValue = $audit->new_values[$key] ?? null;
-                $changes[] = "{$key}: {$oldValue} -> {$newValue}";
+            if ($audit->old_values && $audit->new_values) {
+                $oldValues = json_decode($audit->old_values, true);
+                $newValues = json_decode($audit->new_values, true);
+
+                foreach ($oldValues as $key => $oldValue) {
+                    $newValue = $newValues[$key] ?? null;
+                    $changes[] = "{$key}: {$oldValue} -> {$newValue}";
+                }
             }
             if (!empty($changes)) {
                 $description .= ' Cambios: ' . implode(', ', $changes);
@@ -63,7 +79,7 @@ class AuditObserver {
             'description' => $description,
             'event' => $event,
             'origin_service' => 'FACTURACION',
-            'user_id' => $audit->user_id,
+            'user_id' => $audit->user_id ?: 'system',
         ];
     }
 }
