@@ -4,82 +4,67 @@ namespace App\Observers;
 
 use OwenIt\Auditing\Models\Audit;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cookie;
+use Carbon\Carbon;
 
 class AuditObserver {
-    /**
-     * Handle the Audit "created" event.
-     *
-     * @param Audit $audit
-     * @return void
-     */
     public function created(Audit $audit) {
-        $payload = $this->transformAuditData($audit);
+        $authCookie = Cookie::get('auth_and_user');
+        if (!$authCookie) {
+            return;
+        }
 
-        try {
-            $response = Http::withHeaders([
-                'accept' => 'application/json',
-                'Content-Type' => 'application/json',
-            ])->post('https://seri-api-utn-2024.fly.dev/api/audit', $payload);
+        $authData = json_decode($authCookie, true);
+        $token = $authData['auth_token'] ?? null;
 
-            if ($response->failed()) {
-                Log::error(
-                    'Error al enviar el registro de auditoría a la API de seguridad',
-                    [
-                        'status' => $response->status(),
-                        'headers' => $response->headers(),
-                        'response' => $response->body(),
-                        'payload' => $payload,
-                    ]
-                );
-            }
-        } catch (\Exception $e) {
-            Log::error('Error inesperado al enviar el registro de auditoría', [
-                'exception' => $e->getMessage(),
-                'payload' => $payload,
+        if (!$token) {
+            return;
+        }
+
+        $data = [
+            'date' => Carbon::parse($audit->created_at)->toIso8601String(),
+            'description' => $this->generateDescription($audit),
+            'event' => strtoupper($audit->event),
+            'origin_service' => 'INVENTARIO',
+            'user_id' => $audit->user_id,
+        ];
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+            'Accept' => 'application/json',
+        ])->post('https://seri-api-utn-2024.fly.dev/api/audit', $data);
+
+        if ($response->successful()) {
+        } else {
+            \Log::error('Error al enviar auditoría a la API de seguridad', [
+                'response' => $response->body(),
             ]);
         }
     }
 
     /**
-     * Transforma los datos de auditoría al formato esperado por la API de seguridad.
+     * Generar una descripción para la auditoría.
      *
      * @param Audit $audit
-     * @return array
+     * @return string
      */
-    protected function transformAuditData(Audit $audit) {
-        $eventMap = [
-            'created' => 'INSERT',
-            'updated' => 'UPDATE',
-            'deleted' => 'DELETE',
-        ];
+    protected function generateDescription(Audit $audit): string {
+        $description = "Se realizó la acción '{$audit->event}' en el recurso '{$audit->auditable_type}' (ID: {$audit->auditable_id}).";
 
-        $event = $eventMap[$audit->event] ?? 'UNKNOWN';
-
-        $description = "Se realizó la acción {$audit->event} en el modelo {$audit->auditable_type} con ID {$audit->auditable_id}.";
-
-        if ($audit->event === 'updated') {
-            $changes = [];
-            if ($audit->old_values && $audit->new_values) {
-                $oldValues = json_decode($audit->old_values, true);
-                $newValues = json_decode($audit->new_values, true);
-
-                foreach ($oldValues as $key => $oldValue) {
-                    $newValue = $newValues[$key] ?? null;
-                    $changes[] = "{$key}: {$oldValue} -> {$newValue}";
-                }
+        if (!empty($audit->old_values) || !empty($audit->new_values)) {
+            $description .= ' Detalles: ';
+            if (!empty($audit->old_values)) {
+                $description .=
+                    'Valores antiguos: ' .
+                    json_encode($audit->old_values) .
+                    '. ';
             }
-            if (!empty($changes)) {
-                $description .= ' Cambios: ' . implode(', ', $changes);
+            if (!empty($audit->new_values)) {
+                $description .=
+                    'Valores nuevos: ' . json_encode($audit->new_values) . '.';
             }
         }
 
-        return [
-            'date' => $audit->created_at->toIso8601String(),
-            'description' => $description,
-            'event' => $event,
-            'origin_service' => 'FACTURACION',
-            'user_id' => $audit->user_id ?: 'system',
-        ];
+        return $description;
     }
 }
