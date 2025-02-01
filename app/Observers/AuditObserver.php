@@ -25,7 +25,7 @@ class AuditObserver {
             'date' => Carbon::parse($audit->created_at)->toIso8601String(),
             'description' => $this->generateDescription($audit),
             'event' => strtoupper($audit->event),
-            'origin_service' => 'INVENTARIO',
+            'origin_service' => 'FACTURACION',
             'user_id' => $audit->user_id,
         ];
 
