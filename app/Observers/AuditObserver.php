@@ -18,14 +18,33 @@ class AuditObserver {
         $payload = $this->transformAuditData($audit);
 
         $authCookie = Cookie::get('auth_and_user');
+
         if (!$authCookie) {
             Log::error('No se encontró la cookie "auth_and_user".');
             return;
         }
 
-        $authData = json_decode($authCookie, true);
-        $token = $authData['auth_token'] ?? null;
+        // Verificar si la cookie ya es un array o necesita decodificación
+        if (is_string($authCookie)) {
+            $authData = json_decode($authCookie, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Log::error(
+                    'Error al decodificar la cookie JSON: ' .
+                        json_last_error_msg()
+                );
+                return;
+            }
+        } elseif (is_array($authCookie)) {
+            $authData = $authCookie;
+        } else {
+            Log::error('Formato inesperado de la cookie auth_and_user', [
+                'cookie' => $authCookie,
+            ]);
+            return;
+        }
 
+        // Obtener el token de autenticación
+        $token = $authData['auth_token'] ?? null;
         if (!$token) {
             Log::error('No se encontró el token en la cookie.');
             return;
@@ -88,7 +107,7 @@ class AuditObserver {
             'description' => $description,
             'event' => $event,
             'origin_service' => 'FACTURACION',
-            'user_id' => $userInfo['id'] ?? 'system',
+            'user_id' => $authData['id'] ?? 'system',
         ];
     }
 }
