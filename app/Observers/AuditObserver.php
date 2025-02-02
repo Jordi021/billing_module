@@ -15,8 +15,6 @@ class AuditObserver {
      * @return void
      */
     public function created(Audit $audit) {
-        $payload = $this->transformAuditData($audit);
-
         $authCookie = Cookie::get('auth_and_user');
 
         if (!$authCookie) {
@@ -24,7 +22,6 @@ class AuditObserver {
             return;
         }
 
-        // Verificar si la cookie ya es un array o necesita decodificación
         if (is_string($authCookie)) {
             $authData = json_decode($authCookie, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
@@ -43,12 +40,15 @@ class AuditObserver {
             return;
         }
 
-        // Obtener el token de autenticación
         $token = $authData['auth_token'] ?? null;
+        $userId = $authData['id'] ?? 'system';
+
         if (!$token) {
             Log::error('No se encontró el token en la cookie.');
             return;
         }
+
+        $payload = $this->transformAuditData($audit, $userId);
 
         $response = Http::withHeaders([
             'Accept' => 'application/json',
@@ -73,9 +73,10 @@ class AuditObserver {
      * Transforma los datos de auditoría al formato esperado por la API de seguridad.
      *
      * @param Audit $audit
+     * @param string $userId
      * @return array
      */
-    protected function transformAuditData(Audit $audit) {
+    protected function transformAuditData(Audit $audit, string $userId) {
         $eventMap = [
             'created' => 'INSERT',
             'updated' => 'UPDATE',
@@ -107,7 +108,7 @@ class AuditObserver {
             'description' => $description,
             'event' => $event,
             'origin_service' => 'FACTURACION',
-            'user_id' => $authData['id'] ?? 'system',
+            'user_id' => $userId,
         ];
     }
 }
