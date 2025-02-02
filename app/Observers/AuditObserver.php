@@ -90,11 +90,23 @@ class AuditObserver {
         if ($audit->event === 'updated') {
             $changes = [];
             if ($audit->old_values && $audit->new_values) {
-                $oldValues = json_decode($audit->old_values, true);
-                $newValues = json_decode($audit->new_values, true);
+                $oldValues = is_string($audit->old_values)
+                    ? json_decode($audit->old_values, true)
+                    : $audit->old_values;
+                $newValues = is_string($audit->new_values)
+                    ? json_decode($audit->new_values, true)
+                    : $audit->new_values;
 
                 foreach ($oldValues as $key => $oldValue) {
                     $newValue = $newValues[$key] ?? null;
+
+                    $oldValue = is_array($oldValue)
+                        ? json_encode($oldValue)
+                        : (string) $oldValue;
+                    $newValue = is_array($newValue)
+                        ? json_encode($newValue)
+                        : (string) $newValue;
+
                     $changes[] = "{$key}: {$oldValue} -> {$newValue}";
                 }
             }
