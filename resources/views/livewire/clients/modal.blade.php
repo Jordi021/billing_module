@@ -1,5 +1,5 @@
-<div >
-    <form wire:submit="save" class="p-6">
+<div>
+    <form wire:submit.prevent="save" class="p-6">
         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
             {{ $isEditing ? __('Edit Client') : __('Add New Client') }}
         </h2>
@@ -55,8 +55,8 @@
                 wire:model.live="form.client_type"
             >
                 <option value="" disabled selected>{{ __('Select a type...') }}</option>
-                <option value="Cash">{{ __('Cash') }}</option>
-                <option value="Credit">{{ __('Credit') }}</option>
+                <option value="Cash">Cash</option>
+                <option value="Credit">Credit</option>
             </x-select-input>
             <x-input-error :messages="$errors->get('form.client_type')" class="mt-2" />
         </div>

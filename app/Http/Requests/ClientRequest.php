@@ -30,7 +30,7 @@ class ClientRequest extends FormRequest {
             ],
             'client_type' => ['required', 'string', 'in:Cash,Credit'],
             'address' => ['required', 'string', 'min:10'],
-            'phone' => ['required', 'string', 'numeric', 'digits:9'],
+            'phone' => ['required', 'string', 'numeric', 'digits:10'],
             'email' => ['required', 'email'],
         ];
 
@@ -38,10 +38,10 @@ class ClientRequest extends FormRequest {
             $rules['id'] = [
                 'required',
                 'string',
-                'unique:clients,id',
                 new ValidateCedulaRuc(),
             ];
             $rules['email'][] = 'unique:clients,email';
+            $rules['phone'][] = 'unique:clients,phone';
         }
 
         if (($this->isMethod('PUT') || $this->isMethod('PATCH')) && $id != '') {
@@ -49,6 +49,7 @@ class ClientRequest extends FormRequest {
             // $clientId = $this->route("client")->id;
             $clientId = $id;
             $clientId = $rules['email'][] = 'unique:clients,email,' . $clientId;
+            $clientId = $rules['phone'][] = 'unique:clients,phone,' . $clientId;
         }
 
         return $rules;

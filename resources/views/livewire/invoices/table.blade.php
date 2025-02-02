@@ -80,17 +80,19 @@
 
                             <div class="absolute bottom-4 right-4 flex items-center gap-3">
                                 <a href="{{ URL('invoices/pdf/' . $invoice->id) }}"
-                                    @click="lockInvoice({{ $invoice->id }})"
+                                    @click="lockInvoice({{ $invoice->id }}); $dispatch('invoice-locked')"
                                     class="inline-flex items-center px-3 py-2 bg-blue-500 text-white rounded-md text-sm font-semibold hover:bg-blue-600 focus:ring focus:ring-blue-300 transition"
                                     id="download-pdf-button-{{ $invoice->id }}">
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
                                 <div class="flex gap-1">
-                                    <x-custom-button :disabled="session('locked_invoice_' . $invoice->id)"
-                                        x-bind:disabled="lockedInvoices[{{ $invoice->id }}]"
-                                        color="{{ session('locked_invoice_' . $invoice->id) ? 'bg-gray-400' : 'bg-indigo-400' }}"
-                                        icon="fa fa-pencil" id="edit-button-{{ $invoice->id }}"
-                                        wire:click="$dispatch('invoice-edit', { invoice: {{ $invoice }}, details: {{ $invoice->details }} })" />
+                                    <x-custom-button 
+                                        :disabled="$invoice->is_locked"
+                                        color="{{ $invoice->is_locked ? 'bg-gray-400' : 'bg-indigo-400' }}"
+                                        icon="fa fa-pencil" 
+                                        id="edit-button-{{ $invoice->id }}"
+                                        wire:click="$dispatch('invoice-edit', { invoice: {{ $invoice }}, details: {{ $invoice->details }} })" 
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -152,17 +154,19 @@
                                         <div class="flex gap-3">
 
                                             <a href="{{ URL('invoices/pdf/' . $invoice->id) }}"
-                                                @click="lockInvoice({{ $invoice->id }})"
+                                                @click="lockInvoice({{ $invoice->id }}); $dispatch('invoice-locked')"
                                                 class="inline-flex items-center px-3 py-2 bg-blue-500 text-white rounded-md text-sm font-semibold hover:bg-blue-600 focus:ring focus:ring-blue-300 transition"
                                                 id="download-pdf-button-{{ $invoice->id }}">
                                                 <i class="fas fa-file-pdf"></i>
                                             </a>
                                             <div class="flex gap-1">
-                                                <x-custom-button :disabled="session('locked_invoice_' . $invoice->id)"
-                                                    x-bind:disabled="lockedInvoices[{{ $invoice->id }}]"
-                                                    color="{{ session('locked_invoice_' . $invoice->id) ? 'bg-gray-400' : 'bg-indigo-400' }}"
-                                                    icon="fa fa-pencil" id="edit-button-{{ $invoice->id }}"
-                                                    wire:click="$dispatch('invoice-edit', { invoice: {{ $invoice }}, details: {{ $invoice->details }} })" />
+                                                <x-custom-button 
+                                                    :disabled="$invoice->is_locked"
+                                                    color="{{ $invoice->is_locked ? 'bg-gray-400' : 'bg-indigo-400' }}"
+                                                    icon="fa fa-pencil" 
+                                                    id="edit-button-{{ $invoice->id }}"
+                                                    wire:click="$dispatch('invoice-edit', { invoice: {{ $invoice }}, details: {{ $invoice->details }} })" 
+                                                />
                                             </div>
                                         </div>
                                     </td>

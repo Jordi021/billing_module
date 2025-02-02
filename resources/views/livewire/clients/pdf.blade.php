@@ -131,7 +131,7 @@
             <td>{{ $client->name }} {{ $client->last_name }}</td>
             <td>{{ \Carbon\Carbon::parse($client->birth_date)->format('d/m/Y') }}</td>
             <td class="client-type {{ $client->client_type == 'Credit' ? 'credit' : 'cash' }}">
-                {{ $client->client_type == 'Credit' ? 'Crédito' : 'Contado' }}
+                {{ $client->client_type }}
             </td>
             <td>{{ $client->address }}</td>
             <td>
@@ -139,7 +139,7 @@
                 <small>{{ $client->email }}</small>
             </td>
             <td class="status-{{ $client->status ? 'active' : 'inactive' }}">
-                {{ $client->status ? 'Activo' : 'Inactivo' }}
+                {{ $client->status ? 'Active' : 'Inactive' }}
             </td>
         </tr>
         @endforeach

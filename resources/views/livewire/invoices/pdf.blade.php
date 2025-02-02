@@ -71,7 +71,7 @@
 <div class="header">
     <h1>Reporte de Facturas</h1>
     <div class="report-info">
-        <p>Fecha de emisión: {{ now()->format('d/m/Y H:i:s') }}</p>
+        <p>Fecha de emisión: {{ now()->format('d-m-Y H:i:s') }}</p>
         <p>Total de facturas: {{ $invoices->count() }}</p>
     </div>
 </div>
@@ -83,9 +83,9 @@
             <th>Cliente</th>
             <th>Tipo de Pago</th>
             <th>Fecha</th>
-            <th>Total</th>
             <th>Nota</th>
             <th>Detalles</th>
+            <th>Total</th>
         </tr>
     </thead>
     <tbody>
@@ -94,16 +94,16 @@
             <td>{{ $invoice->id }}</td>
             <td>{{ $invoice->client->name }} {{ $invoice->client->last_name }}</td>
             <td>{{ $invoice->payment_type }}</td>
-            <td>{{ \Carbon\Carbon::parse($invoice->invoice_date)->format('d/m/Y') }}</td>
-            <td>{{ $invoice->total }}</td>
+            <td>{{ \Carbon\Carbon::parse($invoice->invoice_date)->format('d-m-Y H:i:s') }}</td>
             <td>{{ $invoice->note }}</td>
             <td>
                 <ul>
                     @foreach ($invoice->details as $detail)
-                    <li>{{ $detail->product_name }} ({{ $detail->quantity }} x {{ $detail->unit_price }}) - {{ $detail->subtotal }}</li>
+                    <li>ID Producto: {{ $detail->product_id }} ({{ $detail->quantity }} x {{ $detail->unit_price }}) - {{ $detail->subtotal }}</li>
                     @endforeach
                 </ul>
             </td>
+            <td>{{ $invoice->total }}</td>
         </tr>
         @endforeach
     </tbody>

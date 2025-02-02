@@ -19,6 +19,12 @@ class Invoice extends Model implements Auditable {
         'invoice_date',
         'total',
         'note',
+        'is_locked',
+    ];
+
+    protected $casts = [
+        'is_locked' => 'boolean',
+        'invoice_date' => 'datetime',
     ];
 
     public function client(): BelongsTo {

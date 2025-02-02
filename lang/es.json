@@ -221,6 +221,7 @@
     "Search": "Buscar",
     "Search :name": "Buscar :name",
     "Search client": "Buscar cliente",
+    "Search invoice": "Buscar factura",
     "See Other": "Ver otros",
     "Select": "Seleccione",
     "Select All": "Seleccionar todo",
@@ -249,6 +250,7 @@
     "Tags": "Etiquetas",
     "Temporary Redirect": "Redirección temporal",
     "The given data was invalid.": "Los datos proporcionados no son válidos.",
+    "The client field is required.": "El campo cliente es obligatorio.",
     "The response is not a streamed response.": "La respuesta no es una respuesta transmitida.",
     "The response is not a view.": "La respuesta no es una vista.",
     "This action is unauthorized.": "Esta acción no está autorizada.",
@@ -311,5 +313,12 @@
     "Month": "Mes",
     "Payment Type Distribution": "Distribución de Tipos de Pago",
     "Start date:": "Fecha Inicio:",
-    "End date:": "Fecha Fin:"
+    "End date:": "Fecha Fin:",
+    "No details found.": "No se encontraron detalles.",
+    "Invoice Details": "Detalles de Factura",
+    "VAT": "IVA",
+    "Unit Price": "Precio Unitario",
+    "No details found": "No se encontraron detalles",
+    "Show only products in stock": "Mostrar solo productos en stock",
+    "Client Details": "Detalles del Cliente"
 }

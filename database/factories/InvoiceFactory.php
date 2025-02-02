@@ -22,15 +22,20 @@ class InvoiceFactory extends Factory {
         return [
             'client_id' => Client::all()->random()->id,
             'payment_type' => $this->faker->randomElement(['cash', 'credit']),
-            'invoice_date' => $this->faker->dateTimeBetween('-3 year', 'now'),
-            'total' => 0, //will be calculated later based on invoice_detail
+            'invoice_date' => $this->faker->dateTimeBetween(
+                now()->subYears(2),
+                'now'
+            ),
+            'total' => 0,
             'note' => $this->faker->sentence(),
         ];
     }
 
     // Method to add invoice details using local data
     public function withDetails(int $maxProducts = 3) {
-        return $this->afterCreating(function (Invoice $invoice) use ($maxProducts) {
+        return $this->afterCreating(function (Invoice $invoice) use (
+            $maxProducts
+        ) {
             try {
                 // Get products from API
                 $response = Http::withoutVerifying()->get(

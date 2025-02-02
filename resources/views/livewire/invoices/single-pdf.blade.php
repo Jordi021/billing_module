@@ -95,19 +95,23 @@
 <table>
     <thead>
         <tr>
+            <th>Código</th>
             <th>Producto</th>
             <th>Cantidad</th>
-            <th>Precio Unitario</th>
+            <th>Precio Unit.</th>
+            <th>IVA</th>
             <th>Subtotal</th>
         </tr>
     </thead>
     <tbody>
         @foreach ($invoice->details as $detail)
         <tr>
-            <td>{{ $detail->product_name }}</td>
-            <td>{{ $detail->quantity }}</td>
-            <td>{{ number_format($detail->unit_price, 2) }}</td>
-            <td>{{ number_format($detail->subtotal, 2) }}</td>
+            <td>{{ $detail['code'] ?? 'N/A' }}</td>
+            <td>{{ $detail['product_name'] }}</td>
+            <td>{{ $detail['quantity'] }}</td>
+            <td>${{ number_format($detail['unit_price'], 2) }}</td>
+            <td>{{ $detail['vat_percentage'] }}%</td>
+            <td>${{ number_format($detail['subtotal'] + $detail['vat_amount'], 2) }}</td>
         </tr>
         @endforeach
     </tbody>

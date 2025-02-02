@@ -5,6 +5,9 @@ scalar DateTime
 "A date string with format `Y-m-d`, e.g. `2011-05-23`."
 scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
 
+"A scalar type for custom date time format 'm-d-Y H:i:s'."
+scalar CustomDateTime @scalar(class: "App\\GraphQL\\Scalars\\CustomDateTime")
+
 "Indicates what fields are available at the top level of a query operation."
 type Query {
     "Find a single user by an identifying attribute."
@@ -68,12 +71,12 @@ type Client {
 type Invoice {
     id: ID!
     payment_type: String!
-    invoice_date: Date!
+    invoice_date: DateTime! 
     total: Float!
     note: String
     details: [InvoiceDetails] @hasMany(relation: "details")
     created_at: DateTime!
-    updated_at: DateTime!
+    updated_at: DateTime! 
 }
 
 type InvoiceDetails {

@@ -9,6 +9,7 @@ use App\Models\InvoiceDetail;
 use App\Http\Requests\InvoiceRequest;
 use Livewire\Form;
 use Monolog\Logger;
+use App\Helpers\DateHelper;
 
 class InvoiceForm extends Form {
     public ?int $id = null;
@@ -33,12 +34,6 @@ class InvoiceForm extends Form {
         $baseRules = [
             'client_id' => 'required|exists:clients,id',
             'payment_type' => 'required|in:cash,credit',
-            'invoice_date' => [
-                'required',
-                'date',
-                'after_or_equal:1900-01-01',
-                'before_or_equal:' . now()->toDateString(),
-            ],
             'note' => 'nullable|string|max:255',
             'total' => 'required|numeric|min:0',
             'details' => 'required|array|min:1',
@@ -61,10 +56,12 @@ class InvoiceForm extends Form {
     }
 
     public function store(): Invoice {
-        $validated = $this->validate();
+        $this->validate();
 
         try {
-            return DB::transaction(function () use ($validated) {
+            return DB::transaction(function () {
+                $this->invoice_date = now()->format('Y-m-d H:i:s');
+
                 $invoice = Invoice::create([
                     'client_id' => $this->client_id,
                     'payment_type' => $this->payment_type,
@@ -95,14 +92,14 @@ class InvoiceForm extends Form {
     }
 
     public function update(): Invoice {
-        $validated = $this->validate();
+        $this->validate();
         $invoice = Invoice::find($this->id);
+
         try {
-            return DB::transaction(function () use ($validated, $invoice) {
+            return DB::transaction(function () use ($invoice) {
                 $invoice->update([
                     'client_id' => $this->client_id,
                     'payment_type' => $this->payment_type,
-                    'invoice_date' => $this->invoice_date,
                     'note' => $this->note,
                     'total' => $this->total,
                 ]);
@@ -135,5 +132,46 @@ class InvoiceForm extends Form {
     public function save(): void {
         logger('Save method triggered');
         session()->put('temp_invoice_data', $this->all());
+    }
+
+    public function setInvoice(Invoice $invoice): void {
+        $this->id = $invoice->id;
+        $this->client_id = $invoice->client_id;
+        $this->payment_type = $invoice->payment_type;
+        $this->invoice_date = DateHelper::formatForDisplay(
+            $invoice->invoice_date
+        );
+        $this->note = $invoice->note;
+        $this->total = $invoice->total;
+        $this->details = $invoice->details
+            ->map(function ($detail) {
+                return [
+                    'product_id' => $detail->product_id,
+                    'quantity' => $detail->quantity,
+                    'unit_price' => $detail->unit_price,
+                    'subtotal' => $detail->subtotal,
+                    'vat_amount' => $detail->vat_amount,
+                ];
+            })
+            ->toArray();
+    }
+
+    public function fill($attributes) {
+        // Convertir la fecha al formato HTML5 para el input
+        if (isset($attributes['invoice_date'])) {
+            $attributes['invoice_date'] = DateHelper::formatForHtml(
+                $attributes['invoice_date']
+            );
+        }
+
+        return parent::fill($attributes);
+    }
+
+    // Método para obtener la fecha formateada según la región
+    public function getFormattedDate(): string {
+        if ($this->id !== null || !empty($this->invoice_date)) {
+            return DateHelper::fromDatabase($this->invoice_date);
+        }
+        return DateHelper::getCurrentDateTime();
     }
 }

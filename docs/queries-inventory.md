@@ -1,7 +1,7 @@
 # GraphQL Query Tests - For Inventory Module
 
 This document contains example queries for testing the inventory module's GraphQL API.  
-Base URL: https://inventorymodule.lat/graphql 
+Base URL: https://billingmodule.lat/graphql  
 
 ## Available Queries
 

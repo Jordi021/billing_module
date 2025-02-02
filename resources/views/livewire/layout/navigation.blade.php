@@ -26,11 +26,11 @@ $logout = function (Logout $logout) {
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('clients')" :active="request()->routeIs('clients')">
-                        {{ __('Clients') }}
-                    </x-nav-link>
                     <x-nav-link :href="route('invoices')" :active="request()->routeIs('invoices')">
                         {{ __('Invoices') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('clients')" :active="request()->routeIs('clients')">
+                        {{ __('Clients') }}
                     </x-nav-link>
 
 
@@ -44,8 +44,9 @@ $logout = function (Logout $logout) {
                     <x-slot name="trigger">
                         <button
                             class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
-                            <div x-data="{{ json_encode(['name' => request()->get('user')['name'] ?? 'User']) }}" x-text="name"
-                                x-on:profile-updated.window="name = $event.detail.name"></div>
+                            <div x-data="{ name: '{{ __(request()->get('user')['name']) ?? __('User') }}' }" x-text="name"
+                                x-on:profile-updated.window="name = $event.detail.name">
+                            </div>
 
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
@@ -92,19 +93,19 @@ $logout = function (Logout $logout) {
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('clients')" :active="request()->routeIs('clients')">
-                {{ __('Clients') }}
-            </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('invoices')" :active="request()->routeIs('invoices')">
                 {{ __('Invoices') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('clients')" :active="request()->routeIs('clients')">
+                {{ __('Clients') }}
             </x-responsive-nav-link>
         </div>
 
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
             <div class="px-4">
-                <div class="font-medium text-base text-gray-800 dark:text-gray-200" x-data="{{ json_encode(['name' => request()->get('user')['name'] ?? 'User']) }}"
-                    x-text="name" x-on:profile-updated.window="name = $event.detail.name"></div>
+                <div x-data="{ name: '{{ __(request()->get('user')['name']) ?? __('User') }}' }" x-text="name" x-on:profile-updated.window="name = $event.detail.name">
+                </div>
                 <div class="font-medium text-sm text-gray-500">{{ request()->get('user')['email'] }}</div>
             </div>
 

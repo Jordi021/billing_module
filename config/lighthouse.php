@@ -546,4 +546,9 @@ return [
         "driver" =>
             Nuwave\Lighthouse\Tracing\ApolloTracing\ApolloTracing::class,
     ],
+
+    'scalar_types' => [
+        // ...existing scalars...
+        'CustomDateTime' => App\GraphQL\Scalars\CustomDateTime::class,
+    ],
 ];

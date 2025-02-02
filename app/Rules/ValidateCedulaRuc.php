@@ -4,6 +4,7 @@ namespace App\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use App\Models\Client;
 
 class ValidateCedulaRuc implements ValidationRule {
     /**
@@ -16,9 +17,24 @@ class ValidateCedulaRuc implements ValidationRule {
         mixed $value,
         Closure $fail
     ): void {
+        if ($this->isCedulaOrRucRegistered($value)) {
+            $fail($attribute, 'Esta cédula o RUC ya está registrada.');
+        }
+        
         if (!$this->isValidCedulaRuc($value)) {
             $fail($attribute, 'No es una cédula o RUC válido.');
         }
+    }
+
+    /**
+     * Verificar si la cédula o RUC ya está registrada en la base de datos.
+     *
+     * @param  string  $identificacion
+     * @return bool
+     */
+    function isCedulaOrRucRegistered($identificacion) {
+        $cedula = substr($identificacion, 0, 10);
+        return Client::where('id', $cedula)->exists();
     }
 
     /**

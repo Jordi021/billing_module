@@ -4,19 +4,27 @@ namespace App\Livewire\Components;
 use Livewire\Component;
 use App\Models\Client;
 use App\Models\Invoice;
+use App\Helpers\DateHelper;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class Charts extends Component {
     public $startDate;
     public $endDate;
 
     public function mount() {
-        // Establecer fechas iniciales si no están definidas
         if (!$this->startDate) {
-            $this->startDate = Invoice::min('invoice_date');
+            $minDate = Invoice::min('invoice_date');
+            $this->startDate = $minDate ? 
+                Carbon::parse($minDate)->format('Y-m-d') : 
+                Carbon::now()->format('Y-m-d');
         }
+        
         if (!$this->endDate) {
-            $this->endDate = Invoice::max('invoice_date');
+            $maxDate = Invoice::max('invoice_date');
+            $this->endDate = $maxDate ? 
+                Carbon::parse($maxDate)->format('Y-m-d') : 
+                Carbon::now()->format('Y-m-d');
         }
     }
 
@@ -29,14 +37,15 @@ class Charts extends Component {
     public function getChartData() {
         $query = Invoice::query();
 
-        // Aplicar filtro de fechas si ambas están definidas
         if ($this->startDate || $this->endDate) {
             $query
                 ->when($this->startDate, function ($q) {
-                    return $q->where('invoice_date', '>=', $this->startDate);
+                    $startDate = DateHelper::toDatabase($this->startDate);
+                    return $q->whereDate('invoice_date', '>=', $startDate);
                 })
                 ->when($this->endDate, function ($q) {
-                    return $q->where('invoice_date', '<=', $this->endDate);
+                    $endDate = DateHelper::toDatabase($this->endDate);
+                    return $q->whereDate('invoice_date', '<=', $endDate);
                 });
         }
 
@@ -53,33 +62,43 @@ class Charts extends Component {
             ->limit(10)
             ->get();
 
-        // Ventas totales por mes (modificado para ordenar correctamente)
+        // Ventas totales por mes usando TO_CHAR para PostgreSQL
         $monthlySales = $query
             ->selectRaw(
                 "TO_CHAR(invoice_date, 'YYYY-MM') as month, SUM(total) as total_sales"
             )
             ->groupByRaw("TO_CHAR(invoice_date, 'YYYY-MM')")
-            ->orderByRaw("TO_CHAR(invoice_date, 'YYYY-MM') ASC") // Cambiamos el orden a ASC explícitamente
+            ->orderByRaw("TO_CHAR(invoice_date, 'YYYY-MM') ASC")
             ->get()
             ->unique('month')
-            ->values(); // Esto reindexará la colección después de unique
+            ->values();
 
-        // Distribución por tipo de pago
-        $paymentDistribution = $query
-            ->select('payment_type', DB::raw('COUNT(*) as count'))
-            ->groupBy('payment_type')
-            ->get();
+        // Simplificar la distribución por tipo de pago
+        $paymentDistribution = DB::table('invoices')
+            ->selectRaw("
+                COUNT(CASE WHEN payment_type = 'cash' THEN 1 END) as cash_count,
+                COUNT(CASE WHEN payment_type = 'credit' THEN 1 END) as credit_count
+            ")
+            ->when($this->startDate, function ($query) {
+                return $query->whereDate('invoice_date', '>=', DateHelper::toDatabase($this->startDate));
+            })
+            ->when($this->endDate, function ($query) {
+                return $query->whereDate('invoice_date', '<=', DateHelper::toDatabase($this->endDate));
+            })
+            ->first();
 
         return [
             'clients' => $clients,
             'monthlySales' => $monthlySales,
-            'paymentDistribution' => $paymentDistribution,
+            'paymentDistribution' => [
+                ['payment_type' => 'cash', 'count' => $paymentDistribution->cash_count],
+                ['payment_type' => 'credit', 'count' => $paymentDistribution->credit_count]
+            ],
         ];
     }
 
     public function updated($propertyName) {
         if ($propertyName === 'startDate' || $propertyName === 'endDate') {
-            // Validar que startDate no sea mayor que endDate
             if (
                 $this->startDate &&
                 $this->endDate &&

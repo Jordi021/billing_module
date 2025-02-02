@@ -4,31 +4,53 @@ namespace App\Livewire\Invoices;
 
 use Livewire\Component;
 use App\Models\Client;
-use App\Models\Invoice;
 use Livewire\Attributes\On;
 
 class ClientModal extends Component
 {
-
-    public $client;
+    public $client = null;
+    public $isLoading = true;
+    public $clientId;
 
     #[On('client-modal')]
-    public function loadClient($clientId)
+    public function openModal($clientId)
     {
-
-        $this->client = Client::find($clientId);
+        $this->reset(['client']);
+        $this->clientId = $clientId;
+        $this->isLoading = true;
+        
+        // Primero abrimos el modal (mostrará el skeleton)
         $this->dispatch('open-modal', 'client-modal');
+        
+        // Luego disparamos el evento para cargar los datos
+        $this->dispatch('load-client-details');
+    }
+
+    #[On('load-client-details')]
+    public function loadData()
+    {
+        // Simulamos un pequeño delay para ver el skeleton
+        usleep(100000); // 200ms delay
+        
+        try {
+            $this->client = Client::find($this->clientId);
+        } catch (\Exception $e) {
+            logger()->error('Error loading client details:', [
+                'error' => $e->getMessage(),
+                'client_id' => $this->clientId
+            ]);
+        } finally {
+            $this->isLoading = false;
+        }
     }
 
     public function closeModal()
     {
-        $this->dispatch("close");
+        $this->dispatch('close');
     }
-
 
     public function render()
     {
-        logger('ClientModal rendering with client:', ['client' => $this->client]);
         return view('livewire.invoices.client-modal');
     }
 }

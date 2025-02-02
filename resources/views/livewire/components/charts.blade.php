@@ -235,6 +235,7 @@
                 data.paymentDistribution.filter(dist => dist.payment_type === type).reduce((sum, dist) => sum +
                     dist.count, 0)
             );
+
             doughnutChart = new Chart(doughnutChartCtx, {
                 type: 'doughnut',
                 data: {

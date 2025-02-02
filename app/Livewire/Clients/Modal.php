@@ -33,7 +33,8 @@ class Modal extends Component {
     }
 
     public function closeModal() {
-        $this->reset(["form", "isEditing"]);
+        $this->form->resetForm();
+        $this->isEditing = false;
         $this->resetValidation();
         $this->dispatch("close");
     }

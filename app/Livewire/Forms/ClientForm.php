@@ -47,4 +47,15 @@ class ClientForm extends Form {
     public function save(): void {
         session()->put("temp_client_data", $this->all());
     }
+
+    public function resetForm() {
+        $this->id = "";
+        $this->name = "";
+        $this->last_name = "";
+        $this->birth_date = "";
+        $this->client_type = "";
+        $this->address = "";
+        $this->phone = "";
+        $this->email = "";
+    }
 }
