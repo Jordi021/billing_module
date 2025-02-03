@@ -15,40 +15,15 @@ class AuditObserver {
      * @return void
      */
     public function created(Audit $audit) {
+        $sessionId = session()->getId();
+
         $authCookie = Cookie::get('auth_and_user');
 
-        if (!$authCookie) {
-            Log::error('No se encontró la cookie "auth_and_user".');
-            return;
-        }
-
-        if (is_string($authCookie)) {
-            $authData = json_decode($authCookie, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                Log::error(
-                    'Error al decodificar la cookie JSON: ' .
-                        json_last_error_msg()
-                );
-                return;
-            }
-        } elseif (is_array($authCookie)) {
-            $authData = $authCookie;
-        } else {
-            Log::error('Formato inesperado de la cookie auth_and_user', [
-                'cookie' => $authCookie,
-            ]);
-            return;
-        }
+        $authData = json_decode($authCookie, true);
 
         $token = $authData['auth_token'] ?? null;
-        $userId = $authData['id'] ?? 'system';
 
-        if (!$token) {
-            Log::error('No se encontró el token en la cookie.');
-            return;
-        }
-
-        $payload = $this->transformAuditData($audit, $userId);
+        $payload = $this->transformAuditData($audit, $sessionId);
 
         $response = Http::withHeaders([
             'Accept' => 'application/json',
@@ -73,10 +48,9 @@ class AuditObserver {
      * Transforma los datos de auditoría al formato esperado por la API de seguridad.
      *
      * @param Audit $audit
-     * @param string $userId
      * @return array
      */
-    protected function transformAuditData(Audit $audit, string $userId) {
+    protected function transformAuditData(Audit $audit, $sessionId) {
         $eventMap = [
             'created' => 'INSERT',
             'updated' => 'UPDATE',
@@ -107,6 +81,17 @@ class AuditObserver {
                         ? json_encode($newValue)
                         : (string) $newValue;
 
+                    $oldValue = is_null($oldValue)
+                        ? 'null'
+                        : (is_array($oldValue)
+                            ? json_encode($oldValue)
+                            : (string) $oldValue);
+                    $newValue = is_null($newValue)
+                        ? 'null'
+                        : (is_array($newValue)
+                            ? json_encode($newValue)
+                            : (string) $newValue);
+
                     $changes[] = "{$key}: {$oldValue} -> {$newValue}";
                 }
             }
@@ -120,7 +105,7 @@ class AuditObserver {
             'description' => $description,
             'event' => $event,
             'origin_service' => 'FACTURACION',
-            'user_id' => $userId,
+            'user_id' => $sessionId,
         ];
     }
 }
