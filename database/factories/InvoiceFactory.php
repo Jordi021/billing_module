@@ -32,19 +32,18 @@ class InvoiceFactory extends Factory {
     }
 
     // Method to add invoice details using local data
-    public function withDetails(int $maxProducts = 3) {
-        return $this->afterCreating(function (Invoice $invoice) use (
-            $maxProducts
-        ) {
+    public function withDetails(int $minProducts = 2, int $maxProducts = 5) {
+        return $this->afterCreating(function (Invoice $invoice) use ($minProducts, $maxProducts) {
             try {
                 // Get products from API
                 $response = Http::withoutVerifying()->get(
                     'https://seashell-app-9et5v.ondigitalocean.app/api/productos'
                 );
 
-                $products = collect($response->json())->map(function (
-                    $product
-                ) {
+                // Filter and map products with stock
+                $products = collect($response->json())->filter(function ($product) {
+                    return $product['Status'] && $product['Stock'] > 0;
+                })->map(function ($product) {
                     return [
                         'id' => $product['Product_Id'],
                         'code' => $product['Code'],
@@ -60,10 +59,18 @@ class InvoiceFactory extends Factory {
                     ];
                 });
 
-                // Generar un número aleatorio de productos entre 1 y maxProducts
-                $numberOfProducts = rand(1, $maxProducts);
+                // If we don't have enough products with stock, delete the invoice and return
+                if ($products->count() < $minProducts) {
+                    $invoice->delete();
+                    return;
+                }
 
-                // Take random products without filtering
+                // Generate random number of products (mostly 2-5, occasionally 1)
+                $numberOfProducts = rand(1, 100) > 10 ? 
+                    rand($minProducts, $maxProducts) : 
+                    1;
+
+                // Take random products from available stock
                 $selectedProducts = $products->random(
                     min($numberOfProducts, $products->count())
                 );
@@ -71,11 +78,11 @@ class InvoiceFactory extends Factory {
                 $total = 0;
 
                 // Create invoice details
-                $selectedProducts->each(function ($product) use (
-                    $invoice,
-                    &$total
-                ) {
-                    $quantity = rand(1, 5);
+                $selectedProducts->each(function ($product) use ($invoice, &$total) {
+                    // Ensure we don't exceed available stock
+                    $maxQuantity = min(5, $product['stock']);
+                    $quantity = rand(1, $maxQuantity);
+                    
                     $subtotal = $quantity * $product['price'];
                     $vatAmount = $subtotal * ($product['vat_percentage'] / 100);
                     $total += $subtotal + $vatAmount;
@@ -95,6 +102,7 @@ class InvoiceFactory extends Factory {
                 logger()->error('Error in invoice factory:', [
                     'error' => $e->getMessage(),
                 ]);
+                $invoice->delete(); // Delete invoice if there's an error
                 throw $e;
             }
         });
