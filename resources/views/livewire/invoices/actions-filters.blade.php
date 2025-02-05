@@ -26,7 +26,7 @@
                 <!-- Nuevo botón tab de historial -->
                 <div class="absolute -top-5 right-2 sm:right-[148px] md:right-2">
                     <button wire:click="$dispatch('reset-advance-filters')"
-                        class="px-1 text-xs bg-amber-500 hover:bg-amber-600 dark:bg-amber-300 dark:hover:bg-amber-400 text-white dark:text-gray-800 rounded-t-md transition-colors"
+                        class="px-1 pt-[2px] text-xs bg-amber-500 hover:bg-amber-600 dark:bg-amber-300 dark:hover:bg-amber-400 text-white dark:text-gray-800 rounded-t-md transition-colors"
                         title="{{ __('Reset advanced filters') }}">
                         <i class="fa-solid fa-clock-rotate-left"></i>
                     </button>

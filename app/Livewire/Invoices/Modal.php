@@ -64,10 +64,7 @@ class Modal extends Component {
         $this->form->invoice_date = Carbon::parse($invoice['invoice_date'])
             ->setTimezone(config('app.timezone'))
             ->format('Y-m-d\TH:i:s');
-        $this->products = [];
-        $this->fetchProducts();
 
-        $this->dispatch('updatedOrcreated');
         $this->dispatch('invoice-created/updated');
         $this->dispatch('fill-client-select', $invoice['client_id']);
     }
@@ -93,15 +90,6 @@ class Modal extends Component {
             : $this->dispatch('clear-validate-client-id');
 
         $this->isEditing ? $this->form->update() : $this->form->store();
-
-        // Forzar recarga de productos
-        $this->products = [];
-        $this->fetchProducts();
-
-        // Emitir evento con los productos actualizados
-        $this->dispatch('updatedORcreated', [
-            'products' => $this->products,
-        ]);
         $this->dispatch('invoice-created/updated');
         $this->closeModal();
     }
@@ -120,18 +108,6 @@ class Modal extends Component {
         $this->dispatch('clear-validate-client-id');
         $this->dispatch('resetProduct');
         $this->dispatch('close');
-
-        // Asegurarse de que los productos estén actualizados
-        $this->products = [];
-        $this->fetchProducts();
-
-        // Forzar recarga de productos antes de emitir evento
-        $this->products = [];
-        $this->fetchProducts();
-
-        $this->dispatch('updatedORcreated', [
-            'products' => $this->products,
-        ]);
     }
 
     public function mount() {
@@ -326,17 +302,19 @@ class Modal extends Component {
         }
 
         $this->form->details[$index]['quantity'] = $newQuantity;
-        $this->form->details[$index]['subtotal'] = 
-            $this->form->details[$index]['quantity'] * 
+        $this->form->details[$index]['subtotal'] =
+            $this->form->details[$index]['quantity'] *
             $this->form->details[$index]['unit_price'];
-        $this->form->details[$index]['vat_amount'] = 
-            $this->form->details[$index]['subtotal'] * 
+        $this->form->details[$index]['vat_amount'] =
+            $this->form->details[$index]['subtotal'] *
             ($this->form->details[$index]['vat_percentage'] / 100);
 
-        $this->form->total = collect($this->form->details)->sum(function ($detail) {
+        $this->form->total = collect($this->form->details)->sum(function (
+            $detail
+        ) {
             return $detail['subtotal'] + $detail['vat_amount'];
         });
-        
+
         // No necesitamos recargar productos aquí
         $this->dispatch('stock-updated');
     }
