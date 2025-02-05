@@ -4,6 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Favicon -->
+    <link rel="icon" href="{{ asset('bill.ico') }}" type="image/x-icon">
+
 
     <title>Billing Module</title>
 
@@ -67,7 +70,7 @@
                                     class="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-200 rounded-full dark:bg-gray-600">
                                     <i class="fas fa-user-graduate text-xl text-amber-500 dark:text-amber-300"></i>
                                 </div>
-                                 <p>Steven Mateo Garces Davila</p>
+                                <p>Steven Mateo Garces Davila</p>
                             </div>
                         </div>
 
