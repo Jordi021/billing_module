@@ -1,6 +1,6 @@
 <div class="bg-white dark:bg-gray-800 px-4 py-4 border-b border-gray-200 dark:border-gray-700 mb-6 relative">
     <button wire:click="resetFilters"
-        class="absolute top-0 right-4 bg-red-500 px-1 hover:bg-red-600 text-white hover:text-gray-100">
+        class="absolute top-28 sm:top-20 lg:top-14 xl:top-0 right-4 bg-red-500 px-1 hover:bg-red-600 text-white hover:text-gray-100">
         <i class="fas fa-times"></i>
     </button>
     <!-- Contenedor principal: apilado en móvil, flex en xl -->
