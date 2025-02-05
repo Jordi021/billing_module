@@ -119,6 +119,7 @@ class Modal extends Component {
 
         // Load all clients for the dropdown
         $this->clients = Client::orderBy('last_name', 'asc')
+            ->where('status', 'true')
             ->get()
             ->map(function ($client) {
                 return [
