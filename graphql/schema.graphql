@@ -119,7 +119,7 @@ type Query {
 
     creditInvoices: [Invoice!]!
         @all
-        @where(key: "payment_type", value: "credit")
+        @where(key: "payment_type", value: "Credit")
 
     clientWithAllInvoices(id: String @eq): Client
         @field(

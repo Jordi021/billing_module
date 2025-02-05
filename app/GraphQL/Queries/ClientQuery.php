@@ -11,11 +11,11 @@ final readonly class ClientQuery {
 
     public function clientsWithCreditInvoices($root, array $args) {
         return Client::with(['invoices' => function ($query) {
-            $query->where('payment_type', 'credit')
+            $query->where('payment_type', 'Credit')
                   ->orderBy('created_at', 'desc');
         }])
         ->whereHas('invoices', function ($query) {
-            $query->where('payment_type', 'credit');
+            $query->where('payment_type', 'Credit');
         })
         ->get();
     }
@@ -25,11 +25,11 @@ final readonly class ClientQuery {
 
         return Client::where('id', $clientId)
             ->whereHas('invoices', function ($query) {
-                $query->where('payment_type', 'credit');
+                $query->where('payment_type', 'Credit');
             })
             ->with([
                 'invoices' => function ($query) {
-                    $query->where('payment_type', 'credit')->with('details');
+                    $query->where('payment_type', 'Credit')->with('details');
                 },
             ])
             ->first();

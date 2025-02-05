@@ -201,8 +201,11 @@
                 {{ __('Cancel') }}
             </x-secondary-button>
 
-            <x-primary-button class="ms-3">
+            <x-primary-button class="ms-3 flex items-center gap-2" wire:loading.attr="disabled" wire:loading.class="opacity-50 cursor-not-allowed">
                 {{ $isEditing ? __('Update') : __('Create') }}
+                <div wire:loading wire:target="save">
+                    <x-loading-spinner color="black" />
+                </div>
             </x-primary-button>
         </div>
     </form>

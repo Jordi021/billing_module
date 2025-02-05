@@ -1,5 +1,6 @@
 <div class="bg-white dark:bg-gray-800 px-4 py-4 border-b border-gray-200 dark:border-gray-700 mb-6 relative">
-    <button wire:click="resetFilters" class="absolute top-40 sm:top-32 md:top-20 lg:top-14 xl:top-0 right-4 bg-red-500 px-1 hover:bg-red-600 text-white hover:text-gray-100">
+    <button wire:click="resetFilters"
+        class="absolute top-40 sm:top-32 md:top-20 lg:top-14 xl:top-0 right-4 bg-red-500 px-1 hover:bg-red-600 text-white hover:text-gray-100">
         <i class="fas fa-times"></i>
     </button>
 
@@ -21,9 +22,17 @@
                 </button>
             </div>
 
-            <div class="w-full sm:w-auto">
+            <div class="w-full sm:w-auto relative">
+                <!-- Nuevo botón tab de historial -->
+                <div class="absolute -top-[25px] right-2">
+                    <button wire:click="$dispatch('reset-advance-filters')"
+                        class="px-2 py-1 text-xs bg-amber-500 hover:bg-amber-600 dark:bg-amber-300 dark:hover:bg-amber-400 text-white dark:text-gray-800 rounded-t-md transition-colors"
+                        title="{{ __('Reset advanced filters') }}">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </button>
+                </div>
                 <button
-                    class="w-full sm:w-36 inline-flex items-center justify-center px-4 py-2  gap-2 bg-amber-500 dark:bg-amber-300 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-amber-600 dark:hover:bg-amber-500 focus:bg-amber-500 dark:focus:bg-amber-500 active:bg-amber-600 dark:active:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-amber-800 transition ease-in-out duration-300"
+                    class="w-full sm:w-36 inline-flex items-center justify-center px-4 py-2 gap-2 bg-amber-500 dark:bg-amber-300 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-amber-600 dark:hover:bg-amber-500 focus:bg-amber-500 dark:focus:bg-amber-500 active:bg-amber-600 dark:active:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-amber-800 transition ease-in-out duration-300"
                     x-on:click.prevent="$dispatch('open-modal', 'advance-filters-modal')">
                     {{ __('Advanced') }} <i class="fa-solid fa-filter"></i>
                 </button>

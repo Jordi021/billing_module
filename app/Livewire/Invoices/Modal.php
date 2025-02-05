@@ -90,7 +90,13 @@ class Modal extends Component {
             : $this->dispatch('clear-validate-client-id');
 
         $this->isEditing ? $this->form->update() : $this->form->store();
+        
+        // Refrescar los productos después de guardar
+        $this->products = [];
+        $this->fetchProducts();
+        
         $this->dispatch('invoice-created/updated');
+        $this->dispatch('products-updated'); // Nuevo evento
         $this->closeModal();
     }
 
@@ -108,6 +114,10 @@ class Modal extends Component {
         $this->dispatch('clear-validate-client-id');
         $this->dispatch('resetProduct');
         $this->dispatch('close');
+
+        // Refrescar los productos al cerrar el modal
+        $this->products = [];
+        $this->fetchProducts();
     }
 
     public function mount() {
@@ -326,6 +336,7 @@ class Modal extends Component {
                 ->setTimezone(config('app.timezone'))
                 ->format('Y-m-d\TH:i:s');
         }
+        $this->fetchProducts();
         return view('livewire.invoices.modal');
     }
 }

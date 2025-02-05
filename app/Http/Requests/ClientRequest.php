@@ -20,8 +20,13 @@ class ClientRequest extends FormRequest {
      */
     public function rules($id = ''): array {
         $rules = [
-            'name' => ['required', 'string', 'max:50', 'alpha'],
-            'last_name' => ['required', 'string', 'max:50', 'alpha'],
+            'name' => ['required', 'string', 'max:50', 'regex:/^[a-zA-Z\s]+$/'],
+            'last_name' => [
+                'required',
+                'string',
+                'max:50',
+                'regex:/^[a-zA-Z\s]+$/',
+            ],
             'birth_date' => [
                 'required',
                 'date',
@@ -35,11 +40,7 @@ class ClientRequest extends FormRequest {
         ];
 
         if ($this->isMethod('POST')) {
-            $rules['id'] = [
-                'required',
-                'string',
-                new ValidateCedulaRuc(),
-            ];
+            $rules['id'] = ['required', 'string', new ValidateCedulaRuc()];
             $rules['email'][] = 'unique:clients,email';
             $rules['phone'][] = 'unique:clients,phone';
         }
