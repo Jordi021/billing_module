@@ -89,7 +89,7 @@
     <h2>Información del Cliente</h2>
     <p><strong>Nombre:</strong> {{ $invoice->client->name }} {{ $invoice->client->last_name }}</p>
     <p><strong>Tipo de Pago:</strong> {{ $invoice->payment_type }}</p>
-    <p><strong>Fecha:</strong> {{ \Carbon\Carbon::parse($invoice->invoice_date)->format('d/m/Y') }}</p>
+    <p><strong>Fecha:</strong> {{ \Carbon\Carbon::parse($invoice->invoice_date)->format('d/m/Y H:i:s') }}</p>
 </div>
 
 <table>

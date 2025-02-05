@@ -15,8 +15,15 @@
         </div>
 
         <div class="mb-4">
-            <x-date-input label="{{ __('Date') }}" name="invoice_date" :value="$form->getFormattedDate()" type="datetime-local"
-                readonly disabled class="bg-gray-100 dark:bg-gray-700 cursor-not-allowed" />
+            <x-date-input
+                label="{{ __('Date') }}"
+                name="invoice_date"
+                type="datetime-local"
+                readonly
+                disabled
+                :value="$form->invoice_date"
+                class="bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+            />
             <x-input-error :messages="$errors->get('form.invoice_date')" class="mt-2" />
         </div>
         <div class="mb-4">

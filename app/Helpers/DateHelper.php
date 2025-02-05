@@ -81,14 +81,14 @@ class DateHelper {
 
     public static function formatForHtml($date): string {
         if (empty($date)) {
-            return now()->format(self::HTML5_FORMAT);
+            return now()->setTimezone(self::getTimezone())->format(self::HTML5_FORMAT);
         }
         try {
             return Carbon::parse($date)
                 ->setTimezone(self::getTimezone())
                 ->format(self::HTML5_FORMAT);
         } catch (\Exception $e) {
-            return now()->format(self::HTML5_FORMAT);
+            return now()->setTimezone(self::getTimezone())->format(self::HTML5_FORMAT);
         }
     }
 

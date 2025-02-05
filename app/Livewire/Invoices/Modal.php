@@ -7,6 +7,8 @@ use Livewire\Component;
 use Livewire\Attributes\On;
 use App\Models\Client;
 use Illuminate\Support\Facades\Http;
+use App\Helpers\DateHelper;
+use Carbon\Carbon;
 
 class Modal extends Component {
     public $isEditing = false;
@@ -29,9 +31,9 @@ class Modal extends Component {
 
         // Luego realizar las operaciones pesadas
         $this->isEditing = true;
-        
+
         $this->form->fill($invoice);
-        
+
         if (empty($this->products)) {
             $this->fetchProducts();
         }
@@ -58,6 +60,10 @@ class Modal extends Component {
                 ];
             })
             ->toArray();
+
+        $this->form->invoice_date = Carbon::parse($invoice['invoice_date'])
+            ->setTimezone(config('app.timezone'))
+            ->format('Y-m-d\TH:i:s');
 
         // Mover este dispatch al final
         $this->dispatch('fill-client-select', $invoice['client_id']);
@@ -110,7 +116,6 @@ class Modal extends Component {
         $this->total = 0; // Initialize total
 
         // Establecer la fecha actual al montar el componente
-        $this->form->invoice_date = now();
 
         // Load all clients for the dropdown
         $this->clients = Client::orderBy('last_name', 'asc')
@@ -316,6 +321,11 @@ class Modal extends Component {
     }
 
     public function render() {
+        if (!$this->isEditing) {
+            $this->form->invoice_date = now()
+                ->setTimezone(config('app.timezone'))
+                ->format('Y-m-d\TH:i:s');
+        }
         return view('livewire.invoices.modal');
     }
 }
