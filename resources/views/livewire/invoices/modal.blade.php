@@ -22,8 +22,8 @@
         <div class="mb-4">
             <x-select-input label="{{ __('Payment Type') }}" name="payment_type" wire:model="form.payment_type">
                 <option value="" disabled selected>{{ __('Select a type...') }}</option>
-                <option value="cash">Cash</option>
-                <option value="credit">Credit</option>
+                <option value="Cash">Cash</option>
+                <option value="Credit">Credit</option>
             </x-select-input>
             <x-input-error :messages="$errors->get('form.payment_type')" class="mt-2" />
         </div>

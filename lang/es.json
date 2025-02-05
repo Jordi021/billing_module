@@ -320,5 +320,13 @@
     "Unit Price": "Precio Unitario",
     "No details found": "No se encontraron detalles",
     "Show only products in stock": "Mostrar solo productos en stock",
-    "Client Details": "Detalles del Cliente"
+    "Client Details": "Detalles del Cliente",
+    "Advanced": "Avanzado",
+    "Advanced Filters": "Filtros Avanzados",
+    "No invoices available.": "No hay facturas disponibles.",
+    "Select Client": "Seleccionar Cliente",
+    "All Clients": "Todos los Clientes",
+    "Apply": "Aplicar",
+    "Reset": "Resetear",
+    "Start date cannot be greater than end date": "La fecha de inicio no puede ser mayor que la fecha final"
 }

@@ -30,6 +30,9 @@
     <x-modal name="invoice-modal" maxWidth="3xl" :show="false" focusable>
         <livewire:invoices.modal />
     </x-modal>
+    <x-modal name="advance-filters-modal" maxWidth="lg" :show="false" focusable>
+        <livewire:invoices.advanced-filters />
+    </x-modal>
     <x-modal name="client-modal" maxWidth="3xl" :show="false" focusable>
         <livewire:invoices.client-modal lazy/>
     </x-modal>

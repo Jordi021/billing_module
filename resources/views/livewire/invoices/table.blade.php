@@ -43,7 +43,7 @@
                                                 @endphp
                                                 <x-custom-button color="{{ $color }}" img="{{ $imgSrc }}"
                                                     wire:click="$dispatch('client-modal', { clientId: '{{ $invoice->client_id }}' })" />
-                                                <span>{{ $invoice->client->name[0] }}.
+                                                <span>{{ mb_substr($invoice->client->name, 0, 1, 'UTF-8') }}.
                                                     {{ $invoice->client->last_name }}</span>
                                             </div>
                                         </div>
@@ -133,7 +133,7 @@
                                             <x-custom-button color="{{ $color }}" img="{{ $imgSrc }}"
                                                 wire:click="$dispatch('client-modal', { clientId: '{{ $invoice->client_id }}' })" />
                                             <div>
-                                                {{ $invoice->client->name[0] }}. {{ $invoice->client->last_name }}
+                                                {{ mb_substr($invoice->client->name, 0, 1, 'UTF-8') }}. {{ $invoice->client->last_name }}
                                             </div>
                                         </div>
                                     </td>

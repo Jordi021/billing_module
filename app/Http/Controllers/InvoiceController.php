@@ -70,9 +70,10 @@ class InvoiceController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function GenerarPDF($invoiceId = null) {
-        if ($invoiceId) {
-            $invoice = Invoice::with('details')->findOrFail($invoiceId);
+    public function GenerarPDF(Request $request, $id = null)
+    {
+        if ($id) {
+            $invoice = Invoice::with('details')->findOrFail($id);
 
             $invoice->update(['is_locked' => true]);
             $products = $this->fetchProducts();
@@ -103,8 +104,40 @@ class InvoiceController extends Controller {
             return $pdf->download('invoice-' . $invoice->id . '.pdf');
         }
 
-        // Para el reporte general de facturas
-        $invoices = Invoice::all();
+        // Para el reporte general de facturas con filtros avanzados
+        $query = Invoice::query();
+
+        if ($request->client_id) {
+            $query->where('client_id', $request->client_id);
+        }
+
+        if ($request->start_date || $request->end_date) {
+            $query->where(function($q) use ($request) {
+                if ($request->start_date && $request->end_date) {
+                    $q->whereBetween('invoice_date', [
+                        $request->start_date . ' 00:00:00',
+                        $request->end_date . ' 23:59:59'
+                    ]);
+                } elseif ($request->start_date) {
+                    $q->where('invoice_date', '>=', $request->start_date . ' 00:00:00');
+                } elseif ($request->end_date) {
+                    $q->where('invoice_date', '<=', $request->end_date . ' 23:59:59');
+                }
+            });
+        }
+
+        if ($request->status !== 'all') {
+            $query->whereHas('client', function ($clientQuery) use ($request) {
+                $clientQuery->where('status', $request->status);
+            });
+        }
+
+        if ($request->payment_type !== 'all') {
+            $query->where('payment_type', 'ILIKE', '%' . $request->payment_type . '%');
+        }
+
+        $invoices = $query->orderBy('invoice_date', 'desc')->get();
+
         $pdf = PDF::loadView('livewire.invoices.pdf', compact('invoices'));
         return $pdf->download('report_invoices.pdf');
     }

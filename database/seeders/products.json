@@ -1,0 +1,377 @@
+[
+    {
+        "Product_Id": 54,
+        "Code": "PRD-0054",
+        "Name": "Botellon de Agua",
+        "Description": "Botellon de 5L",
+        "Cost": "2.00",
+        "Price": "3.75",
+        "Status": true,
+        "Stock": 100,
+        "Category": {
+            "Category_Id": 1,
+            "Type": "Primera Necesidad",
+            "VAT": 0
+        }
+    },
+    {
+        "Product_Id": 53,
+        "Code": "PRD-0053",
+        "Name": "Agua Cielo",
+        "Description": "Agua Cielo 1 litro",
+        "Cost": "0.30",
+        "Price": "0.50",
+        "Status": true,
+        "Stock": 27,
+        "Category": {
+            "Category_Id": 1,
+            "Type": "Primera Necesidad",
+            "VAT": 0
+        }
+    },
+    {
+        "Product_Id": 52,
+        "Code": "PRD-0052",
+        "Name": "Agua Oxigenada",
+        "Description": "Agua Oxigenada Farmaceutica",
+        "Cost": "1.50",
+        "Price": "2.00",
+        "Status": true,
+        "Stock": 16,
+        "Category": {
+            "Category_Id": 1,
+            "Type": "Primera Necesidad",
+            "VAT": 0
+        }
+    },
+    {
+        "Product_Id": 51,
+        "Code": "PRD-0051",
+        "Name": "Cepillo de dientes",
+        "Description": "Cepillo de dientes Marca Colgate",
+        "Cost": "1.50",
+        "Price": "2.00",
+        "Status": true,
+        "Stock": 36,
+        "Category": {
+            "Category_Id": 1,
+            "Type": "Primera Necesidad",
+            "VAT": 0
+        }
+    },
+    {
+        "Product_Id": 50,
+        "Code": "PRD-0050",
+        "Name": "Producto Básico 50",
+        "Description": "Producto de primera necesidad 50",
+        "Cost": "3.07",
+        "Price": "4.45",
+        "Status": true,
+        "Stock": 9,
+        "Category": {
+            "Category_Id": 1,
+            "Type": "Primera Necesidad",
+            "VAT": 0
+        }
+    },
+    {
+        "Product_Id": 49,
+        "Code": "PRD-0049",
+        "Name": "Producto de Belleza 49",
+        "Description": "Cosmético de alta calidad 49",
+        "Cost": "24.57",
+        "Price": "43.00",
+        "Status": true,
+        "Stock": 22,
+        "Category": {
+            "Category_Id": 6,
+            "Type": "Cosmeticos y Belleza",
+            "VAT": 15
+        }
+    },
+    {
+        "Product_Id": 48,
+        "Code": "PRD-0048",
+        "Name": "Gadget Tecnológico 48",
+        "Description": "Última tecnología en gadgets 48",
+        "Cost": "705.35",
+        "Price": "881.69",
+        "Status": true,
+        "Stock": 15,
+        "Category": {
+            "Category_Id": 2,
+            "Type": "Tecnologia",
+            "VAT": 15
+        }
+    },
+    {
+        "Product_Id": 47,
+        "Code": "PRD-0047",
+        "Name": "Gadget Tecnológico 47",
+        "Description": "Última tecnología en gadgets 47",
+        "Cost": "685.17",
+        "Price": "856.46",
+        "Status": true,
+        "Stock": 11,
+        "Category": {
+            "Category_Id": 2,
+            "Type": "Tecnologia",
+            "VAT": 15
+        }
+    },
+    {
+        "Product_Id": 46,
+        "Code": "PRD-0046",
+        "Name": "Producto de Belleza 46",
+        "Description": "Cosmético de alta calidad 46",
+        "Cost": "49.48",
+        "Price": "86.59",
+        "Status": true,
+        "Stock": 5,
+        "Category": {
+            "Category_Id": 6,
+            "Type": "Cosmeticos y Belleza",
+            "VAT": 15
+        }
+    },
+    {
+        "Product_Id": 45,
+        "Code": "PRD-0045",
+        "Name": "Producto de Belleza 45",
+        "Description": "Cosmético de alta calidad 45",
+        "Cost": "38.47",
+        "Price": "67.32",
+        "Status": true,
+        "Stock": 2,
+        "Category": {
+            "Category_Id": 6,
+            "Type": "Cosmeticos y Belleza",
+            "VAT": 15
+        }
+    },
+    {
+        "Product_Id": 44,
+        "Code": "PRD-0044",
+        "Name": "Producto Básico 44",
+        "Description": "Producto de primera necesidad 44",
+        "Cost": "5.75",
+        "Price": "8.34",
+        "Status": true,
+        "Stock": 0,
+        "Category": {
+            "Category_Id": 1,
+            "Type": "Primera Necesidad",
+            "VAT": 0
+        }
+    },
+    {
+        "Product_Id": 43,
+        "Code": "PRD-0043",
+        "Name": "Medicamento 43",
+        "Description": "Medicamento recetado 43",
+        "Cost": "5.35",
+        "Price": "6.42",
+        "Status": true,
+        "Stock": 30,
+        "Category": {
+            "Category_Id": 3,
+            "Type": "Medicamentos",
+            "VAT": 0
+        }
+    },
+    {
+        "Product_Id": 42,
+        "Code": "PRD-0042",
+        "Name": "Gadget Tecnológico 42",
+        "Description": "Última tecnología en gadgets 42",
+        "Cost": "187.50",
+        "Price": "234.38",
+        "Status": true,
+        "Stock": 0,
+        "Category": {
+            "Category_Id": 2,
+            "Type": "Tecnologia",
+            "VAT": 15
+        }
+    },
+    {
+        "Product_Id": 41,
+        "Code": "PRD-0041",
+        "Name": "Medicamento 41",
+        "Description": "Medicamento recetado 41",
+        "Cost": "5.14",
+        "Price": "6.17",
+        "Status": true,
+        "Stock": 36,
+        "Category": {
+            "Category_Id": 3,
+            "Type": "Medicamentos",
+            "VAT": 0
+        }
+    },
+    {
+        "Product_Id": 40,
+        "Code": "PRD-0040",
+        "Name": "Gadget Tecnológico 40",
+        "Description": "Última tecnología en gadgets 40",
+        "Cost": "252.68",
+        "Price": "315.85",
+        "Status": true,
+        "Stock": 24,
+        "Category": {
+            "Category_Id": 2,
+            "Type": "Tecnologia",
+            "VAT": 15
+        }
+    },
+    {
+        "Product_Id": 39,
+        "Code": "PRD-0039",
+        "Name": "Producto Básico 39",
+        "Description": "Producto de primera necesidad 39",
+        "Cost": "5.05",
+        "Price": "7.32",
+        "Status": true,
+        "Stock": 0,
+        "Category": {
+            "Category_Id": 1,
+            "Type": "Primera Necesidad",
+            "VAT": 0
+        }
+    },
+    {
+        "Product_Id": 38,
+        "Code": "PRD-0038",
+        "Name": "Medicamento 38",
+        "Description": "Medicamento recetado 38",
+        "Cost": "7.72",
+        "Price": "9.26",
+        "Status": true,
+        "Stock": 19,
+        "Category": {
+            "Category_Id": 3,
+            "Type": "Medicamentos",
+            "VAT": 0
+        }
+    },
+    {
+        "Product_Id": 37,
+        "Code": "PRD-0037",
+        "Name": "Bebida Alcohólica 37",
+        "Description": "Bebida con contenido alcohólico 37",
+        "Cost": "10.92",
+        "Price": "16.38",
+        "Status": true,
+        "Stock": 18,
+        "Category": {
+            "Category_Id": 5,
+            "Type": "Bebidas Alcoholicas",
+            "VAT": 15
+        }
+    },
+    {
+        "Product_Id": 36,
+        "Code": "PRD-0036",
+        "Name": "Producto Básico 36",
+        "Description": "Producto de primera necesidad 36",
+        "Cost": "5.78",
+        "Price": "8.38",
+        "Status": true,
+        "Stock": 29,
+        "Category": {
+            "Category_Id": 1,
+            "Type": "Primera Necesidad",
+            "VAT": 0
+        }
+    },
+    {
+        "Product_Id": 35,
+        "Code": "PRD-0035",
+        "Name": "Bebida Alcohólica 35",
+        "Description": "Bebida con contenido alcohólico 35",
+        "Cost": "38.21",
+        "Price": "57.32",
+        "Status": false,
+        "Stock": 6,
+        "Category": {
+            "Category_Id": 5,
+            "Type": "Bebidas Alcoholicas",
+            "VAT": 15
+        }
+    },
+    {
+        "Product_Id": 34,
+        "Code": "PRD-0034",
+        "Name": "Gadget Tecnológico 34",
+        "Description": "Última tecnología en gadgets 34",
+        "Cost": "205.23",
+        "Price": "256.54",
+        "Status": true,
+        "Stock": 25,
+        "Category": {
+            "Category_Id": 2,
+            "Type": "Tecnologia",
+            "VAT": 15
+        }
+    },
+    {
+        "Product_Id": 33,
+        "Code": "PRD-0033",
+        "Name": "Producto Básico 33",
+        "Description": "Producto de primera necesidad 33",
+        "Cost": "3.63",
+        "Price": "5.26",
+        "Status": true,
+        "Stock": 3,
+        "Category": {
+            "Category_Id": 1,
+            "Type": "Primera Necesidad",
+            "VAT": 0
+        }
+    },
+    {
+        "Product_Id": 32,
+        "Code": "PRD-0032",
+        "Name": "Ropa o Calzado 32",
+        "Description": "Producto de moda 32",
+        "Cost": "53.49",
+        "Price": "106.98",
+        "Status": true,
+        "Stock": 0,
+        "Category": {
+            "Category_Id": 4,
+            "Type": "Ropa y Calzado",
+            "VAT": 15
+        }
+    },
+    {
+        "Product_Id": 31,
+        "Code": "PRD-0031",
+        "Name": "Medicamento 31",
+        "Description": "Medicamento recetado 31",
+        "Cost": "9.33",
+        "Price": "11.20",
+        "Status": true,
+        "Stock": 21,
+        "Category": {
+            "Category_Id": 3,
+            "Type": "Medicamentos",
+            "VAT": 0
+        }
+    },
+    {
+        "Product_Id": 30,
+        "Code": "PRD-0030",
+        "Name": "Producto de Belleza 30",
+        "Description": "Cosmético de alta calidad 30",
+        "Cost": "31.29",
+        "Price": "54.76",
+        "Status": true,
+        "Stock": 10,
+        "Category": {
+            "Category_Id": 6,
+            "Type": "Cosmeticos y Belleza",
+            "VAT": 15
+        }
+    }
+]

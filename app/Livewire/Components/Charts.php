@@ -76,8 +76,8 @@ class Charts extends Component {
         // Simplificar la distribución por tipo de pago
         $paymentDistribution = DB::table('invoices')
             ->selectRaw("
-                COUNT(CASE WHEN payment_type = 'cash' THEN 1 END) as cash_count,
-                COUNT(CASE WHEN payment_type = 'credit' THEN 1 END) as credit_count
+                COUNT(CASE WHEN payment_type = 'Cash' THEN 1 END) as cash_count,
+                COUNT(CASE WHEN payment_type = 'Credit' THEN 1 END) as credit_count
             ")
             ->when($this->startDate, function ($query) {
                 return $query->whereDate('invoice_date', '>=', DateHelper::toDatabase($this->startDate));
@@ -91,8 +91,8 @@ class Charts extends Component {
             'clients' => $clients,
             'monthlySales' => $monthlySales,
             'paymentDistribution' => [
-                ['payment_type' => 'cash', 'count' => $paymentDistribution->cash_count],
-                ['payment_type' => 'credit', 'count' => $paymentDistribution->credit_count]
+                ['payment_type' => 'Cash', 'count' => $paymentDistribution->cash_count],
+                ['payment_type' => 'Credit', 'count' => $paymentDistribution->credit_count]
             ],
         ];
     }

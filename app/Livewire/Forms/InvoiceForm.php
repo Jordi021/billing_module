@@ -33,7 +33,7 @@ class InvoiceForm extends Form {
     protected function rules(): array {
         $baseRules = [
             'client_id' => 'required|exists:clients,id',
-            'payment_type' => 'required|in:cash,credit',
+            'payment_type' => 'required|in:Cash,Credit',
             'note' => 'nullable|string|max:255',
             'total' => 'required|numeric|min:0',
             'details' => 'required|array|min:1',

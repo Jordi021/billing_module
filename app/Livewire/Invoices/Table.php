@@ -3,7 +3,6 @@
 namespace App\Livewire\Invoices;
 
 use App\Models\Invoice;
-use App\Models\InvoiceDetail;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
@@ -11,9 +10,17 @@ use Livewire\Attributes\On;
 class Table extends Component {
     use WithPagination;
 
+    //advanced filters
+    public $client_id = '';
+    public $start_date = '';
+    public $end_date = '';
+    public $report_status = 'all';
+    public $report_payment_type = 'all';
+
     public $search = '';
     public $status = 'all';
     public $payment_type = 'all';
+
     protected $queryString = [
         'search' => ['except' => '', 'as' => 's'],
         'status' => ['except' => 'all', 'as' => 'st'],
@@ -25,6 +32,12 @@ class Table extends Component {
         if (in_array($propertyName, ['search', 'status', 'payment_type'])) {
             $this->resetPage();
         }
+    }
+
+    #[On('reset-basic-filters')]
+    public function resetBasicFilters() {
+        $this->reset(['search', 'status', 'payment_type']);
+        $this->dispatch('reset-filters');
     }
 
     #[On('invoice-created/updated')]
@@ -40,15 +53,70 @@ class Table extends Component {
         $this->resetPage();
     }
 
+    #[On('advance-filter-updated')]
+    public function applyAdvanceFilter($filters) {
+        $this->client_id = $filters['client_id'];
+        $this->start_date = $filters['start_date'];
+        $this->end_date = $filters['end_date'];
+        $this->report_status = $filters['status'];
+        $this->report_payment_type = $filters['payment_type'];
+    }
+
     #[On('invoice-locked')]
     public function handleInvoiceLocked() {
         $this->refresh();
     }
 
+    #[On('get-current-filters')]
+    public function sendCurrentFilters() {
+        $this->dispatch('current-filters', [
+            'client_id' => $this->client_id,
+            'start_date' => $this->start_date,
+            'end_date' => $this->end_date,
+            'status' => $this->report_status,
+            'payment_type' => $this->report_payment_type,
+        ]);
+    }
+
     public function render() {
         $query = Invoice::query();
+        $advancedFiltersActive =
+            $this->client_id ||
+            $this->start_date ||
+            $this->end_date ||
+            $this->report_status !== 'all' ||
+            $this->report_payment_type !== 'all';
 
-        if ($this->search) {
+        // Add client_id filter
+        if ($this->client_id) {
+            $query->where('client_id', $this->client_id);
+        }
+
+        // Modify date range filter to handle datetime
+        if ($this->start_date || $this->end_date) {
+            $query->where(function ($q) {
+                if ($this->start_date && $this->end_date) {
+                    $q->whereBetween('invoice_date', [
+                        $this->start_date . ' 00:00:00',
+                        $this->end_date . ' 23:59:59',
+                    ]);
+                } elseif ($this->start_date) {
+                    $q->where(
+                        'invoice_date',
+                        '>=',
+                        $this->start_date . ' 00:00:00'
+                    );
+                } elseif ($this->end_date) {
+                    $q->where(
+                        'invoice_date',
+                        '<=',
+                        $this->end_date . ' 23:59:59'
+                    );
+                }
+            });
+        }
+
+        if ($this->search && !$advancedFiltersActive) {
             $searchTerm = '%' . $this->search . '%';
 
             $query->where(function ($q) use ($searchTerm) {
@@ -76,7 +144,7 @@ class Table extends Component {
             });
         }
 
-        if ($this->status !== 'all') {
+        if ($this->status !== 'all' && !$advancedFiltersActive) {
             logger('Client status in invoice:', [
                 'status invoice' => $this->status,
             ]);
@@ -85,11 +153,25 @@ class Table extends Component {
             });
         }
 
-        if ($this->payment_type !== 'all') {
+        if ($this->report_status !== 'all') {
+            $query->whereHas('client', function ($clientQuery) {
+                $clientQuery->where('status', $this->report_status);
+            });
+        }
+
+        if ($this->payment_type !== 'all' && !$advancedFiltersActive) {
             $query->where(
                 'payment_type',
                 'ILIKE',
                 '%' . $this->payment_type . '%'
+            );
+        }
+
+        if ($this->report_payment_type !== 'all') {
+            $query->where(
+                'payment_type',
+                'ILIKE',
+                '%' . $this->report_payment_type . '%'
             );
         }
 

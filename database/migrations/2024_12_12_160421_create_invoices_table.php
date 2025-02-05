@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->string('client_id', 10);
-            $table->enum('payment_type', ['cash', 'credit']);
+            $table->enum('payment_type', ['Cash', 'Credit']);
             $table->datetime('invoice_date');
             $table->decimal('total', 10, 2)->nullable();
             $table->text('note')->nullable();

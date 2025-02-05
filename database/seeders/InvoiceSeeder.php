@@ -13,7 +13,7 @@ class InvoiceSeeder extends Seeder
      */
     public function run(): void
     {
-        $desiredCount = 15;
+        $desiredCount = 42;
         $actualCreated = 0;
 
         // Intentar crear las facturas una por una
