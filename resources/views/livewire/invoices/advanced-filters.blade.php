@@ -21,10 +21,16 @@
         </div>
 
         <!-- Status -->
-        <x-select-input label="{{ __('Client Status') }}" name="status" wire:model.live="status">
+        <x-select-input 
+            label="{{ __('Client Status') }}" 
+            name="status" 
+            wire:model.live="status"
+            :disabled="!empty($client_id)"
+            class="{{ !empty($client_id) ? 'cursor-not-allowed opacity-60' : '' }}"
+        >
             <option value="all">{{ __('All') }}</option>
-            <option value="1">{{ __('Active') }}</option>
-            <option value="0">{{ __('Inactive') }}</option>
+            <option value="1" {{ !empty($client_id) ? 'disabled' : '' }}>{{ __('Active') }}</option>
+            <option value="0" {{ !empty($client_id) ? 'disabled' : '' }}>{{ __('Inactive') }}</option>
         </x-select-input>
 
         <!-- Payment Type -->

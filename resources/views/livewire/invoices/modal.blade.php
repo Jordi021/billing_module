@@ -15,15 +15,8 @@
         </div>
 
         <div class="mb-4">
-            <x-date-input
-                label="{{ __('Date') }}"
-                name="invoice_date"
-                type="datetime-local"
-                readonly
-                disabled
-                :value="$form->invoice_date"
-                class="bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-            />
+            <x-date-input label="{{ __('Date') }}" name="invoice_date" type="datetime-local" readonly disabled
+                :value="$form->invoice_date" class="bg-gray-100 dark:bg-gray-700 cursor-not-allowed" />
             <x-input-error :messages="$errors->get('form.invoice_date')" class="mt-2" />
         </div>
         <div class="mb-4">
@@ -118,9 +111,19 @@
                         <tbody class="bg-white dark:bg-gray-800">
                             @if (!empty($form->details) && is_array($form->details))
                                 @foreach ($form->details as $index => $detail)
-                                    <tr wire:key="detail-{{ $detail['product_id'] }}">
+                                    <tr x-data="{ 
+                                        quantity: {{ $detail['quantity'] }},
+                                        maxStock: {{ $detail['stock'] }},
+                                        price: {{ $detail['unit_price'] }},
+                                        vat: {{ $detail['vat_percentage'] }},
+                                        updateTotal() {
+                                            let subtotal = this.quantity * this.price;
+                                            let vatAmount = subtotal * (this.vat / 100);
+                                            @this.updateDetail({{ $index }}, this.quantity, subtotal, vatAmount);
+                                        }
+                                    }">
                                         <td class="px-1 py-2 sm:px-2 sm:py-3 text-left">
-                                            <button type="button" wire:click="removeDetail({{ $index }})"
+                                            <button type="button" @click="$wire.removeDetail({{ $index }})"
                                                 class="text-red-600 hover:text-red-900 dark:hover:text-red-400">
                                                 <i class="fas fa-trash"></i>
                                             </button>
@@ -142,17 +145,16 @@
                                         <td class="px-1 py-2 sm:px-2 sm:py-3">
                                             <div class="flex items-center justify-center space-x-0.5 sm:space-x-1">
                                                 <button type="button"
-                                                    wire:click="updateQuantity({{ $index }}, {{ $detail['quantity'] - 1 }})"
+                                                    wire:click.prevent="updateQuantity({{ $index }}, {{ $detail['quantity'] - 1 }})"
                                                     class="p-0.5 sm:p-1 text-gray-500 hover:text-gray-700 dark:hover:text-gray-400 dark:text-gray-200 {{ $detail['quantity'] <= 1 ? 'opacity-50 cursor-not-allowed' : '' }}"
                                                     {{ $detail['quantity'] <= 1 ? 'disabled' : '' }}>
                                                     <i class="fas fa-minus"></i>
                                                 </button>
-                                                <span
-                                                    class="text-xs sm:text-sm text-gray-900 dark:text-gray-200 w-6 sm:w-8 text-center">
+                                                <span class="text-xs sm:text-sm text-gray-900 dark:text-gray-200 w-6 sm:w-8 text-center">
                                                     {{ $detail['quantity'] }}
                                                 </span>
                                                 <button type="button"
-                                                    wire:click="updateQuantity({{ $index }}, {{ $detail['quantity'] + 1 }})"
+                                                    wire:click.prevent="updateQuantity({{ $index }}, {{ $detail['quantity'] + 1 }})"
                                                     class="p-0.5 sm:p-1 text-gray-500 hover:text-gray-700 dark:text-gray-200 dark:hover:text-gray-400 {{ $detail['quantity'] >= $detail['stock'] ? 'opacity-50 cursor-not-allowed' : '' }}"
                                                     {{ $detail['quantity'] >= $detail['stock'] ? 'disabled' : '' }}>
                                                     <i class="fas fa-plus"></i>
@@ -201,7 +203,8 @@
                 {{ __('Cancel') }}
             </x-secondary-button>
 
-            <x-primary-button class="ms-3 flex items-center gap-2" wire:loading.attr="disabled" wire:loading.class="opacity-50 cursor-not-allowed">
+            <x-primary-button class="ms-3 flex items-center gap-2" 
+                wire:loading.class="cursor-not-allowed">
                 {{ $isEditing ? __('Update') : __('Create') }}
                 <div wire:loading wire:target="save">
                     <x-loading-spinner color="black" />
@@ -215,7 +218,7 @@
     function invoiceForm() {
         return {
             selectedProduct: null,
-            quantity: 0, // Cambiado a 0 como valor inicial
+            quantity: 0,
             availableStock: 0,
             tomSelectProduct: null,
             tomSelectClient: null,
@@ -231,17 +234,62 @@
                     }
                 });
 
-                Livewire.on('stock-updated', () => {
-                    this.refreshStockAfterChange();
-                });
+                //  Livewire.on('stock-updated', () => {
+                //      this.refreshStockAfterChange();
+                //  });
 
                 Livewire.on('close', () => {
                     this.resetForm();
                 });
 
+                Livewire.on('updatedORcreated', () => {
+                    console.log('updatedORcreated');
+                    
+                });
+
                 // Observar cambios en showOnlyInStock
                 this.$watch('showOnlyInStock', () => {
                     this.filterProducts();
+                });
+
+                // Escuchar el evento después de guardar/actualizar factura
+                Livewire.on('updatedORcreated', ({products}) => {
+                    // Actualizar la lista local de productos
+                    @this.$refresh();
+                    
+                    // Esperar a que el DOM se actualice
+                    this.$nextTick(() => {
+                        if (this.tomSelectProduct) {
+                            this.tomSelectProduct.destroy();
+                            this.initProductSelect(document.getElementById('select-product'));
+                        }
+                    });
+                });
+
+                // Actualizar cuando se crea/actualiza una factura o se actualiza el stock
+                Livewire.on('invoice-created/updated', () => {
+                    this.$wire.fetchProducts().then(() => {
+                        if (this.tomSelectProduct) {
+                            const currentSelection = this.tomSelectProduct.getValue();
+                            this.tomSelectProduct.clear();
+                            this.tomSelectProduct.clearOptions();
+                            
+                            // Aplicar el filtro actual antes de agregar las opciones
+                            const filteredProducts = this.showOnlyInStock 
+                                ? @this.products.filter(p => p.stock > 0)
+                                : @this.products;
+                                
+                            this.tomSelectProduct.addOptions(filteredProducts);
+                            
+                            // Restaurar selección si aún existe y tiene stock
+                            if (currentSelection) {
+                                const updatedProduct = filteredProducts.find(p => p.id === currentSelection);
+                                if (updatedProduct && updatedProduct.stock > 0) {
+                                    this.tomSelectProduct.setValue(currentSelection);
+                                }
+                            }
+                        }
+                    });
                 });
             },
 
@@ -297,6 +345,12 @@
             },
 
             initProductSelect(el) {
+                // Destruir la instancia existente si existe
+                if (this.tomSelectProduct) {
+                    this.tomSelectProduct.destroy();
+                }
+
+                // Nueva inicialización
                 this.tomSelectProduct = new TomSelect(el, {
                     valueField: 'id',
                     labelField: 'title',
@@ -347,8 +401,10 @@
                     }
                 });
 
-                // Aplicar filtro inicial
-                this.filterProducts();
+                // Aplicar el filtro inicial después de inicializar
+                this.$nextTick(() => {
+                    this.filterProducts();
+                });
 
                 Livewire.on('resetProduct', () => {
                     if (this.tomSelectProduct) {
@@ -360,22 +416,24 @@
             filterProducts() {
                 if (!this.tomSelectProduct) return;
 
-                const allProducts = @json($products);
-                const filteredProducts = this.showOnlyInStock ?
-                    allProducts.filter(product => product.stock > 0) :
-                    allProducts;
+                // Obtener productos actualizados del componente Livewire
+                const allProducts = @this.products;
+                const filteredProducts = this.showOnlyInStock
+                    ? allProducts.filter(product => product.stock > 0)
+                    : allProducts;
 
-                // Guardar la selección actual
                 const currentSelection = this.tomSelectProduct.getValue();
 
-                // Actualizar opciones
                 this.tomSelectProduct.clear();
                 this.tomSelectProduct.clearOptions();
                 this.tomSelectProduct.addOptions(filteredProducts);
 
-                // Restaurar la selección si el producto aún está disponible
-                if (currentSelection && filteredProducts.some(p => p.id === currentSelection)) {
-                    this.tomSelectProduct.setValue(currentSelection);
+                // Restaurar selección si el producto aún está disponible y tiene stock
+                if (currentSelection) {
+                    const updatedProduct = filteredProducts.find(p => p.id === currentSelection);
+                    if (updatedProduct && (!this.showOnlyInStock || updatedProduct.stock > 0)) {
+                        this.tomSelectProduct.setValue(currentSelection);
+                    }
                 }
             },
 
@@ -397,17 +455,17 @@
                 }, 0);
             },
 
-            refreshStockAfterChange() {
-                if (!this.selectedProduct) return;
+            //efreshStockAfterChange() {
+            //   if (!this.selectedProduct) return;
 
-                // Obtener stock actualizado después de cambios en la tabla de detalles
-                this.updateAvailableStock();
+            //   // Obtener stock actualizado después de cambios en la tabla de detalles
+            //   this.updateAvailableStock();
 
-                // Si la cantidad actual es mayor que el nuevo stock disponible, ajustarla
-                if (this.quantity > this.availableStock) {
-                    this.quantity = this.availableStock;
-                }
-            },
+            //   // Si la cantidad actual es mayor que el nuevo stock disponible, ajustarla
+            //   if (this.quantity > this.availableStock) {
+            //       this.quantity = this.availableStock;
+            //   }
+            //,
 
             incrementQuantity() {
                 if (this.quantity < this.availableStock) {

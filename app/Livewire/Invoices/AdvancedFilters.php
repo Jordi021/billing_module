@@ -24,6 +24,12 @@ class AdvancedFilters extends Component {
         $this->updateFilters();
     }
 
+    public function updatedClientId() {
+        if (!empty($this->client_id)) {
+            $this->status = 'all';
+        }
+    }
+
     public function updateFilters() {
         $this->dispatch('advance-filter-updated', [
             'client_id' => $this->client_id,

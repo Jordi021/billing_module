@@ -64,8 +64,11 @@ class Modal extends Component {
         $this->form->invoice_date = Carbon::parse($invoice['invoice_date'])
             ->setTimezone(config('app.timezone'))
             ->format('Y-m-d\TH:i:s');
+        $this->products = [];
+        $this->fetchProducts();
 
-        // Mover este dispatch al final
+        $this->dispatch('updatedOrcreated');
+        $this->dispatch('invoice-created/updated');
         $this->dispatch('fill-client-select', $invoice['client_id']);
     }
 
@@ -90,13 +93,16 @@ class Modal extends Component {
             : $this->dispatch('clear-validate-client-id');
 
         $this->isEditing ? $this->form->update() : $this->form->store();
-        
-        // Refrescar los productos después de guardar
+
+        // Forzar recarga de productos
         $this->products = [];
         $this->fetchProducts();
-        
+
+        // Emitir evento con los productos actualizados
+        $this->dispatch('updatedORcreated', [
+            'products' => $this->products,
+        ]);
         $this->dispatch('invoice-created/updated');
-        $this->dispatch('products-updated'); // Nuevo evento
         $this->closeModal();
     }
 
@@ -115,9 +121,17 @@ class Modal extends Component {
         $this->dispatch('resetProduct');
         $this->dispatch('close');
 
-        // Refrescar los productos al cerrar el modal
+        // Asegurarse de que los productos estén actualizados
         $this->products = [];
         $this->fetchProducts();
+
+        // Forzar recarga de productos antes de emitir evento
+        $this->products = [];
+        $this->fetchProducts();
+
+        $this->dispatch('updatedORcreated', [
+            'products' => $this->products,
+        ]);
     }
 
     public function mount() {
@@ -262,7 +276,6 @@ class Modal extends Component {
         });
 
         $this->resetInputs();
-        $this->dispatch('stock-updated');
     }
 
     public function removeDetail($index) {
@@ -279,6 +292,18 @@ class Modal extends Component {
         $this->dispatch('stock-updated');
     }
 
+    public function updateDetail($index, $quantity, $subtotal, $vatAmount) {
+        $this->form->details[$index]['quantity'] = $quantity;
+        $this->form->details[$index]['subtotal'] = $subtotal;
+        $this->form->details[$index]['vat_amount'] = $vatAmount;
+
+        $this->form->total = collect($this->form->details)->sum(function (
+            $detail
+        ) {
+            return $detail['subtotal'] + $detail['vat_amount'];
+        });
+    }
+
     public function updateQuantity($index, $newQuantity) {
         if ($newQuantity < 1) {
             return;
@@ -287,8 +312,6 @@ class Modal extends Component {
         $productId = $this->form->details[$index]['product_id'];
         $product = collect($this->products)->firstWhere('id', $productId);
 
-        // Calcular el stock disponible incluyendo la cantidad actual del ítem
-        $currentQty = $this->form->details[$index]['quantity'];
         $otherItemsQty = collect($this->form->details)
             ->where('product_id', $productId)
             ->where(function ($item, $idx) use ($index) {
@@ -303,21 +326,24 @@ class Modal extends Component {
         }
 
         $this->form->details[$index]['quantity'] = $newQuantity;
-        $this->form->details[$index]['subtotal'] =
-            $this->form->details[$index]['quantity'] *
+        $this->form->details[$index]['subtotal'] = 
+            $this->form->details[$index]['quantity'] * 
             $this->form->details[$index]['unit_price'];
-        $this->form->details[$index]['vat_amount'] =
-            $this->form->details[$index]['subtotal'] *
+        $this->form->details[$index]['vat_amount'] = 
+            $this->form->details[$index]['subtotal'] * 
             ($this->form->details[$index]['vat_percentage'] / 100);
 
-        $this->form->total = collect($this->form->details)->sum(function (
-            $detail
-        ) {
+        $this->form->total = collect($this->form->details)->sum(function ($detail) {
             return $detail['subtotal'] + $detail['vat_amount'];
         });
-
+        
+        // No necesitamos recargar productos aquí
         $this->dispatch('stock-updated');
     }
+
+    // Eliminar updateDetailWithoutRefresh ya que no lo usaremos
+
+    // Eliminar los métodos updateQuantity ya que no los usaremos más
 
     public function getProductStock($productId) {
         return $this->getAvailableStock($productId);
@@ -336,7 +362,6 @@ class Modal extends Component {
                 ->setTimezone(config('app.timezone'))
                 ->format('Y-m-d\TH:i:s');
         }
-        $this->fetchProducts();
         return view('livewire.invoices.modal');
     }
 }
