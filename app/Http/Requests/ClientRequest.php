@@ -20,12 +20,12 @@ class ClientRequest extends FormRequest {
      */
     public function rules($id = ''): array {
         $rules = [
-            'name' => ['required', 'string', 'max:50', 'regex:/^[a-zA-Z\s]+$/'],
+            'name' => ['required', 'string', 'max:50', 'regex:/^[\pL\s]+$/u'],
             'last_name' => [
                 'required',
                 'string',
                 'max:50',
-                'regex:/^[a-zA-Z\s]+$/',
+                'regex:/^[\pL\s]+$/u',
             ],
             'birth_date' => [
                 'required',

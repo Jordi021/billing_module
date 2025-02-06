@@ -58,6 +58,10 @@ class InvoiceForm extends Form {
     public function store(): Invoice {
         $this->validate();
 
+        if ($this->id && Invoice::find($this->id)->is_locked) {
+            return null;
+        }
+
         try {
             return DB::transaction(function () {
                 $this->invoice_date = now()->format('Y-m-d H:i:s');
@@ -91,9 +95,13 @@ class InvoiceForm extends Form {
         }
     }
 
-    public function update(): Invoice {
+    public function update() {
         $this->validate();
         $invoice = Invoice::find($this->id);
+
+        if ($invoice->is_locked) {
+            return null;
+        }
 
         try {
             return DB::transaction(function () use ($invoice) {

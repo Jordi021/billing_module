@@ -1,4 +1,4 @@
-<div x-data="{ 
+<div x-data="{
     lockedInvoices: {},
     lockInvoice(id) {
         this.lockedInvoices[id] = true;
@@ -86,13 +86,10 @@
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
                                 <div class="flex gap-1">
-                                    <x-custom-button 
-                                        :disabled="$invoice->is_locked"
+                                    <x-custom-button :disabled="$invoice->is_locked"
                                         color="{{ $invoice->is_locked ? 'bg-gray-400' : 'bg-indigo-400' }}"
-                                        icon="fa fa-pencil" 
-                                        id="edit-button-{{ $invoice->id }}"
-                                        wire:click="$dispatch('invoice-edit', { invoice: {{ $invoice }}, details: {{ $invoice->details }} })" 
-                                    />
+                                        icon="fa fa-pencil" id="edit-button-{{ $invoice->id }}"
+                                        wire:click="$dispatch('invoice-edit', { invoice: {{ $invoice }}, details: {{ $invoice->details }} })" />
                                 </div>
                             </div>
                         </div>
@@ -133,7 +130,8 @@
                                             <x-custom-button color="{{ $color }}" img="{{ $imgSrc }}"
                                                 wire:click="$dispatch('client-modal', { clientId: '{{ $invoice->client_id }}' })" />
                                             <div>
-                                                {{ mb_substr($invoice->client->name, 0, 1, 'UTF-8') }}. {{ $invoice->client->last_name }}
+                                                {{ mb_substr($invoice->client->name, 0, 1, 'UTF-8') }}.
+                                                {{ $invoice->client->last_name }}
                                             </div>
                                         </div>
                                     </td>
@@ -160,13 +158,10 @@
                                                 <i class="fas fa-file-pdf"></i>
                                             </a>
                                             <div class="flex gap-1">
-                                                <x-custom-button 
-                                                    :disabled="$invoice->is_locked"
+                                                <x-custom-button :disabled="$invoice->is_locked"
                                                     color="{{ $invoice->is_locked ? 'bg-gray-400' : 'bg-indigo-400' }}"
-                                                    icon="fa fa-pencil" 
-                                                    id="edit-button-{{ $invoice->id }}"
-                                                    wire:click="$dispatch('invoice-edit', { invoice: {{ $invoice }}, details: {{ $invoice->details }} })" 
-                                                />
+                                                    icon="fa fa-pencil" id="edit-button-{{ $invoice->id }}"
+                                                    wire:click="$dispatch('invoice-edit', { invoice: {{ $invoice }}, details: {{ $invoice->details }} })" />
                                             </div>
                                         </div>
                                     </td>

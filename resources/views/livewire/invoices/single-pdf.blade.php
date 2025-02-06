@@ -99,8 +99,9 @@
             <th>Producto</th>
             <th>Cantidad</th>
             <th>Precio Unit.</th>
-            <th>IVA</th>
             <th>Subtotal</th>
+            <th>IVA</th>
+            <th>Total</th>
         </tr>
     </thead>
     <tbody>
@@ -110,7 +111,8 @@
             <td>{{ $detail['product_name'] }}</td>
             <td>{{ $detail['quantity'] }}</td>
             <td>${{ number_format($detail['unit_price'], 2) }}</td>
-            <td>{{ $detail['vat_percentage'] }}%</td>
+            <td>${{ number_format($detail['subtotal'], 2) }}</td>
+            <td>${{ number_format($detail['vat_amount'], 2) }}</td>
             <td>${{ number_format($detail['subtotal'] + $detail['vat_amount'], 2) }}</td>
         </tr>
         @endforeach
@@ -118,5 +120,7 @@
 </table>
 
 <div class="total-summary">
-    <p><strong>Total:</strong> {{ number_format($invoice->total, 2) }}</p>
+    <p><strong>Subtotal General:</strong> ${{ number_format($invoice->details->sum('subtotal'), 2) }}</p>
+    <p><strong>IVA Total:</strong> ${{ number_format($invoice->details->sum('vat_amount'), 2) }}</p>
+    <p><strong>Total:</strong> ${{ number_format($invoice->total, 2) }}</p>
 </div>

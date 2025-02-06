@@ -88,8 +88,11 @@ class Modal extends Component {
                 __('The client field is required.')
             )
             : $this->dispatch('clear-validate-client-id');
+        $editCreate = $this->isEditing ? $this->form->update() : $this->form->store();
 
-        $this->isEditing ? $this->form->update() : $this->form->store();
+        if(!$editCreate) {
+            $this->dispatch('invoiceError', 'La factura está bloqueada y no se puede editar.');
+        }
         $this->dispatch('invoice-created/updated');
         $this->closeModal();
     }

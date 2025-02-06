@@ -4,6 +4,10 @@
             {{ $isEditing ? __('Edit invoice') : __('Create New invoice') }}
         </h2>
 
+        <div x-show="errorMessage" class="alert alert-danger mb-4">
+            <span x-text="errorMessage"></span>
+        </div>
+
         <div class="mb-4" wire:ignore>
             <label for="client_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {{ __('Client') }}
@@ -111,7 +115,7 @@
                         <tbody class="bg-white dark:bg-gray-800">
                             @if (!empty($form->details) && is_array($form->details))
                                 @foreach ($form->details as $index => $detail)
-                                    <tr x-data="{ 
+                                    <tr x-data="{
                                         quantity: {{ $detail['quantity'] }},
                                         maxStock: {{ $detail['stock'] }},
                                         price: {{ $detail['unit_price'] }},
@@ -150,7 +154,8 @@
                                                     {{ $detail['quantity'] <= 1 ? 'disabled' : '' }}>
                                                     <i class="fas fa-minus"></i>
                                                 </button>
-                                                <span class="text-xs sm:text-sm text-gray-900 dark:text-gray-200 w-6 sm:w-8 text-center">
+                                                <span
+                                                    class="text-xs sm:text-sm text-gray-900 dark:text-gray-200 w-6 sm:w-8 text-center">
                                                     {{ $detail['quantity'] }}
                                                 </span>
                                                 <button type="button"
@@ -203,8 +208,7 @@
                 {{ __('Cancel') }}
             </x-secondary-button>
 
-            <x-primary-button class="ms-3 flex items-center gap-2" 
-                wire:loading.class="cursor-not-allowed">
+            <x-primary-button class="ms-3 flex items-center gap-2" wire:loading.class="cursor-not-allowed">
                 {{ $isEditing ? __('Update') : __('Create') }}
                 <div wire:loading wire:target="save">
                     <x-loading-spinner color="black" />
@@ -223,6 +227,7 @@
             tomSelectProduct: null,
             tomSelectClient: null,
             showOnlyInStock: false, // Nueva variable para el toggle
+            errorMessage: '', // Nueva variable para el mensaje de error
 
             init() {
                 this.$watch('selectedProduct', (value) => {
@@ -232,6 +237,15 @@
                     } else {
                         this.quantity = 0;
                     }
+                });
+
+                Livewire.on('invoiceError', (message) => {
+                    this.errorMessage = message;
+                    setTimeout(() => {
+                        this.errorMessage = '';
+                        this.$dispatch('close-modal', 'invoice-modal');
+                        @this.closeModal();
+                    }, 3000);
                 });
 
                 //  Livewire.on('stock-updated', () => {
@@ -244,7 +258,7 @@
 
                 Livewire.on('updatedORcreated', () => {
                     console.log('updatedORcreated');
-                    
+
                 });
 
                 // Observar cambios en showOnlyInStock
@@ -253,10 +267,12 @@
                 });
 
                 // Escuchar el evento después de guardar/actualizar factura
-                Livewire.on('updatedORcreated', ({products}) => {
+                Livewire.on('updatedORcreated', ({
+                    products
+                }) => {
                     // Actualizar la lista local de productos
                     @this.$refresh();
-                    
+
                     // Esperar a que el DOM se actualice
                     this.$nextTick(() => {
                         if (this.tomSelectProduct) {
@@ -273,17 +289,18 @@
                             const currentSelection = this.tomSelectProduct.getValue();
                             this.tomSelectProduct.clear();
                             this.tomSelectProduct.clearOptions();
-                            
+
                             // Aplicar el filtro actual antes de agregar las opciones
-                            const filteredProducts = this.showOnlyInStock 
-                                ? @this.products.filter(p => p.stock > 0)
-                                : @this.products;
-                                
+                            const filteredProducts = this.showOnlyInStock ?
+                                @this.products.filter(p => p.stock > 0) :
+                                @this.products;
+
                             this.tomSelectProduct.addOptions(filteredProducts);
-                            
+
                             // Restaurar selección si aún existe y tiene stock
                             if (currentSelection) {
-                                const updatedProduct = filteredProducts.find(p => p.id === currentSelection);
+                                const updatedProduct = filteredProducts.find(p => p.id ===
+                                    currentSelection);
                                 if (updatedProduct && updatedProduct.stock > 0) {
                                     this.tomSelectProduct.setValue(currentSelection);
                                 }
@@ -418,9 +435,9 @@
 
                 // Obtener productos actualizados del componente Livewire
                 const allProducts = @this.products;
-                const filteredProducts = this.showOnlyInStock
-                    ? allProducts.filter(product => product.stock > 0)
-                    : allProducts;
+                const filteredProducts = this.showOnlyInStock ?
+                    allProducts.filter(product => product.stock > 0) :
+                    allProducts;
 
                 const currentSelection = this.tomSelectProduct.getValue();
 
